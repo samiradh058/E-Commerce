@@ -28,7 +28,9 @@ export default function RootLayout({
         className={`${josefinSans.variable} antialiased h-screen flex flex-col`}
       >
         <Header />
-        <main className="flex-grow overflow-y-scroll">{children}</main>
+        <main className="flex-grow overflow-y-scroll w-[98%] mx-auto">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>
