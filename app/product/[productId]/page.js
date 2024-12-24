@@ -1,5 +1,7 @@
 import BuyCart from "@/app/_components/BuyCart";
+import QnA from "@/app/_components/QnA";
 import Quantity from "@/app/_components/Quantity";
+import Rating from "@/app/_components/Rating";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -100,7 +102,8 @@ export default async function ProductPage() {
           </div>
         </div>
       </div>
-      <div>Hello</div>
+      <Rating />
+      <QnA />
     </div>
   );
 }
