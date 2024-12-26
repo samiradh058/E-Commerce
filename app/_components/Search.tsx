@@ -2,16 +2,20 @@ import { FaSearch } from "react-icons/fa";
 
 export default function Search() {
   return (
-    <div className="flex items-center">
-      <form>
-        <div className="flex items-center bg-white rounded-md">
+    <div className="flex items-center justify-center p-4">
+      <form className="w-full max-w-md">
+        <div className="flex items-center bg-white rounded-full shadow-md overflow-hidden">
           <input
             type="text"
-            className="w-60 h-8 rounded-l-md px-2 focus:outline-none focus:border-2 focus:border-stone-400 focus:border-r-0"
+            className="w-full h-10 px-4 py-2 text-gray-700 focus:outline-none"
+            placeholder="Search for products..."
           />
-          <div className="bg-gray-400 px-2 h-8 rounded-md flex justify-center items-center">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 flex items-center justify-center hover:bg-blue-600 rounded-full transition-colors duration-300 h-10"
+          >
             <FaSearch />
-          </div>
+          </button>
         </div>
       </form>
     </div>

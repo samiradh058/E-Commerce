@@ -21,26 +21,58 @@ const cartItems = [
 
 export default function Cart() {
   return (
-    <>
-      <div className="mt-8 text-[18px] bg-green-200 px-2 py-1 rounded-lg border border-green-500 w-fit">
+    <div className="bg-gray-100 min-h-screen p-4">
+      <div className="mt-0 text-[18px] bg-green-200 px-4 py-2 rounded-lg border border-green-500 w-fit">
         <Link href="/">Go Back</Link>
       </div>
-      <div className="w-[80%] mx-auto mt-8">
-        <h2 className="font-semibold text-[24px] mb-4">
-          Items in your cart are:
+      <div className="w-full md:w-[80%] mx-auto mt-4">
+        <h2 className="font-semibold text-[24px] mb-4 text-center">
+          Items in your cart:
         </h2>
-        {cartItems.map((item, index) => (
-          <div key={index}>
-            <ul className="my-2 py-2 px-2 grid grid-cols-12 w-[60%] text-[20px] bg-stone-100 hover:bg-stone-200">
-              <li className="col-span-4 ">{item.name}</li>
-              <li className="col-span-4">{item.price}</li>
-              <li className="col-span-4">
-                <Quantity />
-              </li>
-            </ul>
+        <div className="space-y-4">
+          <div className="grid grid-cols-12 gap-4 items-center bg-gray-200 p-4 rounded-lg">
+            <div className="col-span-3 font-semibold flex justify-center">
+              Name
+            </div>
+            <div className="col-span-2 font-semibold flex justify-center">
+              Unit Price
+            </div>
+            <div className="col-span-2 font-semibold flex justify-center">
+              Total Price
+            </div>
+            <div className="col-span-2 font-semibold flex justify-center">
+              Price with Delivery
+            </div>
+            <div className="col-span-3 font-semibold flex justify-center">
+              Quantity
+            </div>
           </div>
-        ))}
+          {cartItems.map((item, index) => (
+            <div
+              key={index}
+              className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300"
+            >
+              <ul className="grid grid-cols-12 gap-4 items-center">
+                <li className="col-span-3 text-lg font-medium flex justify-center">
+                  {item.name}
+                </li>
+                <li className="col-span-2 text-lg font-medium flex justify-center">
+                  Rs. {item.price}
+                </li>
+                <li className="col-span-2 text-lg font-medium flex justify-center">
+                  Rs. {item.price * item.quantity}
+                </li>
+                <li className="col-span-2 text-lg font-medium flex justify-center">
+                  Rs. {item.price * item.quantity + 50}
+                </li>
+                <li className="col-span-3 flex justify-center">
+                  <Quantity />
+                </li>
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
-    </>
+    </div>
   );
 }

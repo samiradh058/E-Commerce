@@ -16,23 +16,24 @@ const items = [
 
 export default function Main() {
   return (
-    <div className="bg-green-300 flex-grow">
-      <h2 className="p-4 text-[20px]">Available Items:</h2>
-      <ul className="grid grid-cols-12 list-style-none gap-4 mx-2">
+    <div className="bg-gray-100 flex-grow p-6">
+      <h2 className="text-2xl font-bold mb-6 text-center">Available Items:</h2>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {items.map((item) => (
           <Link
             href={`/product/${item.productId}`}
             key={item.name}
-            className="col-span-3 bg-pink-300 flex flex-col gap-2 pb-2 rounded-md hover:scale-105 transition-transform duration-200"
+            className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-transform duration-300"
           >
             <div className="relative h-56">
-              <Image src="/logo.png" alt="Item" fill />
+              <Image src="/logo.png" alt="Item" fill className="object-cover" />
             </div>
-
-            <div className="flex flex-col justify-center pl-2">
-              <h3 className="text-[20px] font-semibold">{item.name}</h3>
-              <p className="text-[18px]">Rs.{item.price}</p>
-              <p className="text-[18px]">{item.quantityAvailable} remaining</p>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
+              <p className="text-gray-700 mb-1">Rs. {item.price}</p>
+              <p className="text-gray-500">
+                {item.quantityAvailable} remaining
+              </p>
             </div>
           </Link>
         ))}
