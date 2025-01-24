@@ -8,10 +8,11 @@ const items = [
   { productId: 4, name: "Item 4", price: 40, quantityAvailable: 10 },
   { productId: 5, name: "Item 5", price: 50, quantityAvailable: 100 },
   { productId: 6, name: "Item 6", price: 60, quantityAvailable: 10 },
-  { productId: 7, name: "Item 7", price: 70, quantityAvailable: 10 },
-  { productId: 8, name: "Item 8", price: 80, quantityAvailable: 10 },
+  { productId: 7, name: "Item 7", price: 70, quantityAvailable: 44 },
+  { productId: 8, name: "Item 8", price: 80, quantityAvailable: 19 },
   { productId: 9, name: "Item 9", price: 90, quantityAvailable: 10 },
   { productId: 10, name: "Item 10", price: 100, quantityAvailable: 10 },
+  { productId: 11, name: "Item 11", price: 100, quantityAvailable: 2 },
 ];
 
 export default function Main() {
