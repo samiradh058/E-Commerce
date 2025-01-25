@@ -12,7 +12,6 @@ const items = [
   { productId: 8, name: "Item 8", price: 80, quantityAvailable: 19 },
   { productId: 9, name: "Item 9", price: 90, quantityAvailable: 10 },
   { productId: 10, name: "Item 10", price: 100, quantityAvailable: 10 },
-  { productId: 11, name: "Item 11", price: 100, quantityAvailable: 2 },
 ];
 
 export default function Main() {
