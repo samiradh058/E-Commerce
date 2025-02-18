@@ -5,10 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 
-export default async function ProductPage() {
-  //Fetch data
-  // const param = await params;
-  // const id = await param.productId;
+interface Params {
+  params: string;
+}
+
+export default async function ProductPage({ params }) {
+  const param = await params;
+  console.log(param);
+  const id = await param.productId;
+  console.log(id);
 
   const productDetails = {
     name: "Product 1",
