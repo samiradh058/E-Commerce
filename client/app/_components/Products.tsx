@@ -1,8 +1,5 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 interface Product {
   _id: string;
@@ -14,29 +11,7 @@ interface Product {
   quantity: number;
 }
 
-export default function Products() {
-  const [items, setItems] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("http://localhost:8080/products")
-      .then((res) => res.json())
-      .then((data) => {
-        setItems(data);
-        console.log(data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching products:", error);
-        setIsLoading(false);
-      });
-  }, []);
-  console.log(items);
-
-  if (isLoading) {
-    throw new Promise(() => {});
-  }
-
+export default function Products({ items }: { items: Product[] }) {
   return (
     <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
       {items.length > 0 &&
@@ -46,7 +21,7 @@ export default function Products() {
             key={item._id}
             className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-transform duration-300"
           >
-            <div className="relative h-56">
+            <div className="relative h-56 w-full">
               <Image src="/icon.png" alt="Item" fill className="object-cover" />
             </div>
             <div className="p-4">
