@@ -1,20 +1,11 @@
-import BuyCart from "@/app/_components/BuyCart";
-import QnA from "@/app/_components/QnA";
-import Quantity from "@/app/_components/Quantity";
+import BuyCart from "@/app/(content)/_components/BuyCart";
+import QnA from "@/app/(content)/_components/QnA";
+import Quantity from "@/app/(content)/_components/Quantity";
 import Image from "next/image";
 import Link from "next/link";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 
-interface Params {
-  params: string;
-}
-
-export default async function ProductPage({ params }) {
-  const param = await params;
-  console.log(param);
-  const id = await param.productId;
-  console.log(id);
-
+export default async function ProductPage() {
   const productDetails = {
     name: "Product 1",
     description: "Very comfortable and stylish product",

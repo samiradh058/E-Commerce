@@ -1,7 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import { Josefin_Sans } from "next/font/google";
-import "./globals.css";
+import "../../app/globals.css";
 import Header from "./_components/Header";
 import Footer from "./_components/Footer";
 
