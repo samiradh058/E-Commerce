@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import "../globals.css";
 import Image from "next/image";
 import Link from "next/link";
+import Navigation from "./_components/Navigation";
 
 export const metadata = {
   title: "Next.js Page Routing & Rendering",
@@ -22,12 +23,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </h1>
           </Link>
         </div>
-        <Link
-          href="/signup"
-          className="absolute top-2 right-2 z-10 bg-green-600 py-1 px-2 font-semibold text-white rounded-full"
-        >
-          Signup
-        </Link>
+        <Navigation />
         <div className="relative w-screen h-screen bg-black">
           <Image
             src="/bg.jpg"

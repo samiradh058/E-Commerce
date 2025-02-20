@@ -50,8 +50,8 @@ export default function LoginSignupModern() {
   };
 
   return (
-    <div className="flex items-center justify-center py-4 bg-gray-100 w-full">
-      <div className="w-full max-w-sm p-6 bg-white rounded-2xl shadow-lg">
+    <div className="flex items-center justify-center w-full">
+      <div className="w-[18rem] sm:w-[20rem] lg:w-[22rem] max-w-sm p-6 bg-white rounded-2xl shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-6">
           {loginSignup2Text}
         </h2>
@@ -78,7 +78,7 @@ export default function LoginSignupModern() {
           ))}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
+            className="w-full bg-primary text-white p-2 rounded-lg hover:opacity-95 hover:scale-105 transition-transform duration-200"
           >
             {loginSignup2Text}
           </button>

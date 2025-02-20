@@ -65,7 +65,7 @@ export default function LoginSignupModern() {
           ))}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
+            className="w-full bg-primary text-white p-2 rounded-lg hover:opacity-95 hover:scale-105 transition-transform duration-200"
           >
             {loginSignup2Text}
           </button>
