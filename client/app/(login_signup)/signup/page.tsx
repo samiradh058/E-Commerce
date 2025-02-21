@@ -1,5 +1,7 @@
 "use client";
 
+import { signupUser } from "@/app/(content)/_utils/user";
+import { redirect } from "next/navigation";
 import { JSX, useState } from "react";
 import { IoMdPerson, IoIosMail, IoMdKey } from "react-icons/io";
 
@@ -38,9 +40,16 @@ export default function LoginSignupModern() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Logging in with:", formData);
+    const result = await signupUser(formData);
+
+    if (result.success) {
+      alert("Signup successful, login now!");
+      redirect("/login");
+    } else {
+      alert("Signup failed: " + result.error);
+    }
   };
 
   const iconMap: { [key: string]: JSX.Element } = {

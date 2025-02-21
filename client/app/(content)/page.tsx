@@ -1,5 +1,5 @@
 import Products from "./_components/Products";
-import { getProducts } from "./_utils/getProducts";
+import { getProducts } from "./_utils/products";
 
 export default async function Main() {
   const products = await getProducts();

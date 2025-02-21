@@ -7,6 +7,7 @@ const app = express();
 const PORT = 8080;
 
 app.use(cors());
+app.use(express.json());
 
 mongoose
   .connect("mongodb://localhost:27017/e-commerce")

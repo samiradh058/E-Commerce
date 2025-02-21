@@ -1,7 +1,9 @@
 "use client";
 
+import { loginUser } from "@/app/(content)/_utils/user";
+import { redirect } from "next/navigation";
 import { JSX, useState } from "react";
-import { IoMdPerson, IoMdKey } from "react-icons/io";
+import { IoIosMail, IoMdKey } from "react-icons/io";
 
 export default function LoginSignupModern() {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
@@ -9,10 +11,10 @@ export default function LoginSignupModern() {
   const loginSignup2Text = "Login";
   const loginSignup2Form = [
     {
-      label: "Name",
-      type: "text",
-      name: "name",
-      icon: "IoMdPerson",
+      label: "Email",
+      type: "email",
+      name: "email",
+      icon: "IoIosMail",
     },
     {
       label: "Password",
@@ -26,13 +28,19 @@ export default function LoginSignupModern() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Logging in with:", formData);
+    const result = await loginUser(formData);
+
+    if (!result.success) {
+      alert(result.error);
+    } else {
+      redirect("/");
+    }
   };
 
   const iconMap: { [key: string]: JSX.Element } = {
-    IoMdPerson: <IoMdPerson className="text-gray-500" />,
+    IoIosMail: <IoIosMail className="text-gray-500" />,
     IoMdKey: <IoMdKey className="text-gray-500" />,
   };
 
