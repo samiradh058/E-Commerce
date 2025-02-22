@@ -1,10 +1,14 @@
-import type { Metadata } from "next";
+"use client";
+
+// import type { Metadata } from "next";
 import Quantity from "../_components/Quantity";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Cart",
-};
+// export const metadata: Metadata = {
+//   title: "Cart",
+// };
 
 const cartItems = [
   { productId: 1, name: "Item 1", price: 10, quantity: 10 },
@@ -20,6 +24,24 @@ const cartItems = [
 ];
 
 export default function Cart() {
+  const router = useRouter();
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function checkAuth() {
+      const response = await fetch("http://localhost:8080/cart");
+      const data = await response.json();
+      if (response.status === 401) {
+        router.replace("/login");
+      } else if (!response.ok) {
+        setError("Failed to load cart items" + data);
+      }
+    }
+    checkAuth();
+  }, [router]);
+
+  if (error) return;
+
   return (
     <div className="bg-gray-100 min-h-screen p-4">
       <div className="mt-0 text-[18px] bg-green-200 px-4 py-2 rounded-lg border border-green-500 w-fit">

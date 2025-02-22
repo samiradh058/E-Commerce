@@ -1,13 +1,15 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import session from "express-session";
+import passport from "passport";
+// import cookieParser from "cookie-parser";
+import MongoStore from "connect-mongo";
 import routes from "./routes/index.mjs";
+import "./strategies/passport.mjs";
 
 const app = express();
 const PORT = 8080;
-
-app.use(cors());
-app.use(express.json());
 
 mongoose
   .connect("mongodb://localhost:27017/e-commerce")
@@ -15,6 +17,29 @@ mongoose
     console.log("Connected to Mongoose");
   })
   .catch((err) => console.log(err));
+
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(express.json());
+
+// app.use(cookieParser("Samir"));
+app.use(
+  session({
+    secret: "Samir",
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+      sameSite: "lax",
+    },
+    store: MongoStore.create({
+      client: mongoose.connection.getClient(),
+    }),
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(routes);
 
