@@ -14,6 +14,12 @@ router.get("/products", async (req, res) => {
 
 router.get("/cart", async (req, res) => {
   console.log("Cart route hit");
+  console.log("Full session:", req.session);
+  console.log("Session ID after login:", req.session.id);
+  console.log("Session ID when accessing cart:", req.sessionID);
+
+  console.log("Saving user session:", req.session.user);
+
   try {
     if (!req.session.user) {
       return res.status(401).json({ message: "Unauthorized, Login first!" });

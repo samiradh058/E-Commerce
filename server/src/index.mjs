@@ -25,23 +25,34 @@ app.use(express.json());
 app.use(
   session({
     secret: "Samir",
-    saveUninitialized: false,
-    resave: false,
+    resave: true,
+    saveUninitialized: true,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none", // Allow cross-origin cookies
+      secure: process.env.NODE_ENV === "production", // Only true in production
     },
     store: MongoStore.create({
-      client: mongoose.connection.getClient(),
+      mongoUrl: "mongodb://localhost:27017/e-commerce",
+      collectionName: "sessions",
     }),
   })
 );
+
+app.use((req, res, next) => {
+  console.log("Session Data:", req.session);
+  next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(routes);
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 // Creating product
 // const createProduct = async () => {
@@ -76,7 +87,3 @@ app.use(routes);
 // app.get("/api/home", (req, res) => {
 //   res.json({ message: "Hello World" });
 // });
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});

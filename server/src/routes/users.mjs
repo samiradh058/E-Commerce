@@ -40,12 +40,6 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
-    }
-
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res.status(400).json({ message: "User does not exist" });
@@ -61,7 +55,19 @@ router.post("/login", async (req, res) => {
       name: existingUser.name,
       email: existingUser.email,
     };
-    return res.status(200).json({ message: "Login successful" });
+
+    console.log("Session before saving:", req.session);
+
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.status(500).json({ message: "Failed to save session" });
+      }
+      console.log("Session successfully saved:", req.session);
+      console.log("Session ID during login:", req.sessionID);
+
+      return res.status(200).json({ message: "Login successful" });
+    });
   } catch (error) {
     console.error("Error in login route:", error);
     res.status(500).json({ message: "Login failed" });
