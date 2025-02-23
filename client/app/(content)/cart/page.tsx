@@ -29,10 +29,14 @@ export default function Cart() {
 
   useEffect(() => {
     async function checkAuth() {
-      const response = await fetch("http://localhost:8080/cart");
+      const response = await fetch("http://localhost:8080/cart", {
+        method: "GET",
+        credentials: "include",
+      });
       const data = await response.json();
       if (response.status === 401) {
-        router.replace("/login");
+        // router.replace("/login");
+        console.log("data from frontend", data);
       } else if (!response.ok) {
         setError("Failed to load cart items" + data);
       }
