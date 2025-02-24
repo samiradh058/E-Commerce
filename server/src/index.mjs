@@ -21,29 +21,20 @@ mongoose
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 
-// app.use(cookieParser("Samir"));
 app.use(
   session({
-    secret: "Samir",
-    resave: true,
-    saveUninitialized: true,
+    secret: "samir",
+    resave: false,
+    saveUninitialized: false,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-      httpOnly: true,
-      sameSite: "none", // Allow cross-origin cookies
-      secure: process.env.NODE_ENV === "production", // Only true in production
+      secure: false,
+      maxAge: 1000 * 60 * 60 * 24,
     },
     store: MongoStore.create({
-      mongoUrl: "mongodb://localhost:27017/e-commerce",
-      collectionName: "sessions",
+      client: mongoose.connection.getClient(),
     }),
   })
 );
-
-app.use((req, res, next) => {
-  console.log("Session Data:", req.session);
-  next();
-});
 
 app.use(passport.initialize());
 app.use(passport.session());

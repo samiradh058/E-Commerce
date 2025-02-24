@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Product } from "../mongoose/Products.mjs";
+import { Product } from "../mongoose/products.mjs";
 
 const router = Router();
 
@@ -13,18 +13,14 @@ router.get("/products", async (req, res) => {
 });
 
 router.get("/cart", async (req, res) => {
-  console.log("Cart route hit");
-  console.log("Full session:", req.session);
-  console.log("Session ID after login:", req.session.id);
-  console.log("Session ID when accessing cart:", req.sessionID);
-
-  console.log("Saving user session:", req.session.user);
-
   try {
-    if (!req.session.user) {
+    if (!req.user) {
       return res.status(401).json({ message: "Unauthorized, Login first!" });
     }
-    res.json({ message: "Cart route hit", user: req.session.user });
+    return res.status(200).json({
+      message: "Cart route hit, message sent from backend",
+      user: req.user,
+    });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch cart" });
   }

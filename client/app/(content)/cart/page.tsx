@@ -25,7 +25,7 @@ const cartItems = [
 
 export default function Cart() {
   const router = useRouter();
-  const [error, setError] = useState("");
+  const [error] = useState("");
 
   useEffect(() => {
     async function checkAuth() {
@@ -33,12 +33,12 @@ export default function Cart() {
         method: "GET",
         credentials: "include",
       });
+
       const data = await response.json();
       if (response.status === 401) {
-        // router.replace("/login");
-        console.log("data from frontend", data);
-      } else if (!response.ok) {
-        setError("Failed to load cart items" + data);
+        router.replace("/login");
+      } else if (response.status === 200) {
+        console.log("Logged in:", data);
       }
     }
     checkAuth();
