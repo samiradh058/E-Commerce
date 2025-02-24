@@ -33,6 +33,10 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  qna: {
+    type: Array,
+    required: false,
+  },
 });
 
 export const Product = mongoose.model("Product", productSchema);

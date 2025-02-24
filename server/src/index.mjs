@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 import cors from "cors";
 import session from "express-session";
 import passport from "passport";
-// import cookieParser from "cookie-parser";
 import MongoStore from "connect-mongo";
 import routes from "./routes/index.mjs";
 import "./strategies/passport.mjs";
+import { Product } from "./mongoose/products.mjs";
 
 const app = express();
 const PORT = 8080;
@@ -54,6 +54,7 @@ app.listen(PORT, () => {
 //     image: "https://example.com/smartphone.jpg",
 //     category: "All",
 //     description: "Cost efficient smart phone",
+//     qna: [{ question: "How is it", answer: "Good" }],
 //   });
 
 //   try {
@@ -66,6 +67,7 @@ app.listen(PORT, () => {
 // createProduct();
 
 // Fetch all products
+
 /* Product.find()
   .then((products) => {
     console.log("All Products:", products);

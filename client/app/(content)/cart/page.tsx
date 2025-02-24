@@ -2,9 +2,9 @@
 
 // import type { Metadata } from "next";
 import Quantity from "../_components/Quantity";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "../_components/BackButton";
 
 // export const metadata: Metadata = {
 //   title: "Cart",
@@ -49,7 +49,7 @@ export default function Cart() {
   return (
     <div className="bg-gray-100 min-h-screen p-4">
       <div className="mt-0 text-[18px] bg-green-200 px-4 py-2 rounded-lg border border-green-500 w-fit">
-        <Link href="/">Go Back</Link>
+        <BackButton />
       </div>
       <div className="w-full md:w-[80%] mx-auto mt-4">
         <h2 className="font-semibold text-[24px] mb-4 text-center">

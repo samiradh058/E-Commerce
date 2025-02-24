@@ -12,6 +12,22 @@ router.get("/products", async (req, res) => {
   }
 });
 
+router.get("/products/:productId", async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const product = await Product.findOne({ productId: productId });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.status(200).json(product);
+  } catch (error) {
+    console.error("Error fetching product by ID:", error);
+    return res.status(500).json({ message: "Failed to fetch product" });
+  }
+});
+
 router.get("/cart", async (req, res) => {
   try {
     if (!req.user) {

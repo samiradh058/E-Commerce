@@ -1,6 +1,6 @@
 interface QnAItem {
-  Question: string;
-  Answer: string;
+  question: string;
+  answer: string;
 }
 
 interface QnAProps {
@@ -14,9 +14,9 @@ export default function QnA({ qna }: QnAProps) {
       </h2>
       {qna.map((item, index) => (
         <div key={index} className="p-2 break-words">
-          <li className="font-medium">{item.Question}</li>
+          <li className="font-medium">{item.question}</li>
           <li style={{ listStyle: "none" }} className="indent-5">
-            {item.Answer}
+            {item.answer}
           </li>
         </div>
       ))}
