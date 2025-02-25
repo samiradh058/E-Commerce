@@ -1,11 +1,11 @@
 import BuyCart from "@/app/(content)/_components/BuyCart";
 import QnA from "@/app/(content)/_components/QnA";
-import Quantity from "@/app/(content)/_components/Quantity";
 import Image from "next/image";
 import Link from "next/link";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { getProductFromId } from "../../_utils/products";
 import BackButton from "../../_components/BackButton";
+import AskQuestion from "../../_components/AskQuestion";
 
 export default async function ProductPage({
   params,
@@ -14,7 +14,8 @@ export default async function ProductPage({
     productId: string;
   };
 }) {
-  const product = await getProductFromId(params.productId);
+  const param = await params;
+  const product = await getProductFromId(param.productId);
 
   // const product = {
   //   name: "Product 1",
@@ -87,8 +88,8 @@ export default async function ProductPage({
               </div>
               <div className="flex justify-between items-center gap-4 w-full">
                 <div className="flex flex-col gap-4">
-                  <Quantity />
-                  <BuyCart />
+                  <AskQuestion productId={product.productId} />
+                  <BuyCart productId={product.productId} />
                 </div>
                 <div className="flex flex-col">
                   <p className="text-[18px] text-stone-500 mb-2">
