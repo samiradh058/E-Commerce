@@ -26,14 +26,23 @@ export default function Header() {
   }, []);
 
   return (
-    <div className="bg-stone-200 h-fit flex w-[98%] mx-auto justify-between">
-      <Link href="/" className="p-1 flex flex-col items-center">
-        <div className="relative h-16 aspect-square">
-          <Image src="/logo.png" alt="Logo" fill className="rounded-full" />
+    <div className="bg-background shadow-md h-fit flex w-[98%] mx-auto justify-between items-center p-3 rounded-lg">
+      <Link href="/" className="flex items-center gap-2">
+        <div className="relative h-12 w-12">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            fill
+            className="rounded-full border border-border"
+          />
         </div>
-        <h1 className="font-bold text-[16px] tracking-wide">QuickCart</h1>
+        <h1 className="font-bold text-xl text-primary tracking-wide">
+          QuickCart
+        </h1>
       </Link>
+
       <Search />
+
       {loggedIn && user ? <UserLogout user={user} /> : <Login_Singup />}
     </div>
   );

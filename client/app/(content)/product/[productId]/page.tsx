@@ -1,4 +1,4 @@
-import BuyCart from "@/app/(content)/_components/BuyCart";
+import AddToCart from "@/app/(content)/_components/AddToCart";
 import QnA from "@/app/(content)/_components/QnA";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,6 +6,7 @@ import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { getProductFromId } from "../../_utils/products";
 import BackButton from "../../_components/BackButton";
 import AskQuestion from "../../_components/AskQuestion";
+import Buy from "../../_components/Buy";
 
 export default async function ProductPage({
   params,
@@ -38,12 +39,12 @@ export default async function ProductPage({
   const hasHalfStar = product.rating % 1 !== 0;
 
   return (
-    <div className="bg-gray-100 min-h-screen p-4">
-      <div className="text-[18px] bg-green-200 px-4 py-2 rounded-lg border border-green-500 w-fit">
+    <div className="bg-background min-h-screen p-6">
+      <div className="">
         <BackButton />
       </div>
-      <div className="w-full md:w-[80%] mx-auto mt-2 text-[18px]">
-        <div className="flex flex-col md:flex-row justify-between items-center p-6 rounded-lg shadow-md">
+      <div className="w-full md:w-[80%] mx-auto text-lg">
+        <div className="flex flex-col md:flex-row justify-between items-center p-6 rounded-lg shadow-md bg-cardBg">
           <div className="flex flex-col md:flex-row gap-8 items-center w-full">
             <div className="relative h-56 w-56 md:h-96 md:w-96">
               <Image
@@ -53,55 +54,58 @@ export default async function ProductPage({
                 className="object-cover rounded-lg"
               />
             </div>
-            <div className="flex flex-col gap-4 md:gap-6 flex-grow">
-              <div className="flex flex-col gap-2">
-                <h1 className="font-semibold text-[24px] md:text-[28px]">
+            <div className="flex flex-col gap-6 md:gap-8 flex-grow">
+              <div className="flex flex-col gap-4">
+                <h1 className="font-semibold text-xl md:text-2xl text-textPrimary">
                   {product.name}
                 </h1>
-                <div className="italic text-[16px] md:text-[18px]">
+                <div className="italic text-base md:text-lg text-textSecondary">
                   {product.description}
                 </div>
-                <div className="flex gap-2 items-center font-semibold text-[20px]">
+                <div className="flex gap-2 items-center font-semibold text-xl text-textPrimary">
                   <span>{product.rating}</span>
                   {Array.from({ length: fullStars }).map((_, index) => (
                     <FaStar key={index} className="text-yellow-400" />
                   ))}
                   {hasHalfStar && <FaStarHalfAlt className="text-yellow-400" />}
                 </div>
-                <Link href="#qna" className="text-blue-500 hover:underline">
-                  <span className="font-semibold text-[20px]">
+                <Link href="#qna" className="text-info hover:underline">
+                  <span className="font-semibold text-xl">
                     {product.qna.length}
                   </span>{" "}
                   Answered Questions
                 </Link>
-                <p className="text-[16px] md:text-[18px]">
+                <p className="text-base md:text-lg text-textSecondary">
                   Brand: <span className="font-semibold">{product.brand}</span>
                 </p>
-                <p className="text-[16px] md:text-[18px]">
+                <p className="text-base md:text-lg text-textSecondary">
                   Price:{" "}
                   <span className="font-semibold">Rs. {product.price}</span>
                 </p>
-                <p className="text-[16px] md:text-[18px]">
+                <p className="text-base md:text-lg text-textSecondary">
                   Quantity:{" "}
                   <span className="font-semibold">{product.quantity}</span>
                 </p>
               </div>
-              <div className="flex justify-between items-center gap-4 w-full">
-                <div className="flex flex-col gap-4">
+              <div className="flex justify-between items-center gap-6 w-full">
+                <div className="flex flex-col gap-6">
                   <AskQuestion productId={product.productId} />
-                  <BuyCart productId={product.productId} />
+                  <div className="flex gap-4 mt-4">
+                    <AddToCart productId={product.productId} />
+                    <Buy productId={product.productId} />
+                  </div>
                 </div>
                 <div className="flex flex-col">
-                  <p className="text-[18px] text-stone-500 mb-2">
+                  <p className="text-lg text-textSecondary mb-2">
                     Delivery Options
                   </p>
-                  <p>
+                  <p className="text-lg">
                     Delivery Fee:{" "}
-                    <span className="font-semibold text-[20px]">Rs. X</span>
+                    <span className="font-semibold text-xl">Rs. X</span>
                   </p>
-                  <p>
+                  <p className="text-lg">
                     Cash on Delivery:{" "}
-                    <span className="font-semibold text-[20px]">Available</span>
+                    <span className="font-semibold text-xl">Available</span>
                   </p>
                 </div>
               </div>
@@ -112,7 +116,7 @@ export default async function ProductPage({
 
       <div
         id="qna"
-        className="h-fit mt-2 flex items-center w-full md:w-[80%] mx-auto"
+        className="h-fit mt-4 flex items-center w-full md:w-[80%] mx-auto"
       >
         <QnA qna={product.qna} />
       </div>

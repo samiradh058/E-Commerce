@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
-export default function BuyCart({ productId }: { productId: string }) {
+export default function AddToCart({ productId }: { productId: string }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [inCart, setInCart] = useState(false);
   const router = useRouter();
@@ -79,15 +79,12 @@ export default function BuyCart({ productId }: { productId: string }) {
   };
 
   return (
-    <div className="flex gap-2 mt-4 text-nowrap">
-      <button className="w-full bg-red-400 py-1 px-2 rounded-md">Buy</button>
-      <button
-        onClick={handleAddToCart}
-        className="w-full bg-pink-400 py-1 px-2 rounded-md"
-        disabled={inCart}
-      >
-        {inCart ? "Added" : "Add to Cart"}
-      </button>
-    </div>
+    <button
+      onClick={handleAddToCart}
+      className="w-full bg-pink-400 py-1 px-2 rounded-md"
+      disabled={inCart}
+    >
+      {inCart ? "Added" : "Add to Cart"}
+    </button>
   );
 }

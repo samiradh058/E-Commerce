@@ -1,6 +1,5 @@
-"use client";
-
 import { useState } from "react";
+import { updateQuantity } from "../_utils/products";
 
 export default function Quantity({
   productId,
@@ -13,26 +12,11 @@ export default function Quantity({
 }) {
   const [quantity, setQuantity] = useState(initialQuantity);
 
-  async function updateQuantity(action: "increase" | "decrease") {
-    try {
-      const res = await fetch("http://localhost:8080/cart/update", {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ productId, action }),
-      });
-
-      if (res.ok) {
-        const { updatedQuantity } = await res.json();
-        setQuantity(updatedQuantity);
-        onQuantityChange(updatedQuantity);
-      } else {
-        console.error("Error updating quantity");
-      }
-    } catch (error) {
-      console.error("Error updating quantity", error);
+  async function handleUpdateQuantity(action: "increase" | "decrease") {
+    const updatedQuantity = await updateQuantity(productId, action);
+    if (updatedQuantity !== undefined) {
+      setQuantity(updatedQuantity);
+      onQuantityChange(updatedQuantity);
     }
   }
 
@@ -42,7 +26,7 @@ export default function Quantity({
       <div className="flex gap-1">
         <button
           className="px-2 bg-green-400 rounded-lg"
-          onClick={() => updateQuantity("decrease")}
+          onClick={() => handleUpdateQuantity("decrease")}
           disabled={quantity <= 1}
         >
           -
@@ -50,7 +34,7 @@ export default function Quantity({
         <span className="px-2">{quantity}</span>
         <button
           className="px-2 bg-yellow-400 rounded-lg"
-          onClick={() => updateQuantity("increase")}
+          onClick={() => handleUpdateQuantity("increase")}
         >
           +
         </button>

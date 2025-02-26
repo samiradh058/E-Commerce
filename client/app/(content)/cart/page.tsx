@@ -4,8 +4,9 @@ import Quantity from "../_components/Quantity";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "../_components/BackButton";
-import { ImCross } from "react-icons/im";
 import { deleteCartItem, fetchCartItems } from "../_utils/products";
+import Buy from "../_components/Buy";
+import DeleteCartItem from "../_components/DeleteCartItem";
 
 export default function Cart() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function Cart() {
       setCartItems((prevCartItems) =>
         prevCartItems.filter((item) => item.productId !== productId)
       );
+      router.refresh();
     }
   }
 
@@ -59,68 +61,68 @@ export default function Cart() {
     );
 
   return (
-    <div className="bg-gray-100 min-h-screen p-4">
-      <div className="mt-0 text-[18px] bg-green-200 px-4 py-2 rounded-lg border border-green-500 w-fit">
+    <div className="bg-background min-h-screen p-6">
+      {/* Back Button */}
+      <div>
         <BackButton />
       </div>
-      <div className="w-full md:w-[80%] mx-auto mt-4">
-        <h2 className="font-semibold text-[24px] mb-4 text-center">
+
+      {/* Cart Container */}
+      <div className="w-full md:w-[80%] mx-auto">
+        <h2 className="font-semibold text-2xl text-textPrimary text-center mb-6">
           Items in your cart:
         </h2>
-        <div className="space-y-4">
-          <div className="grid grid-cols-12 gap-4 items-center bg-gray-200 p-4 rounded-lg">
-            <div className="col-span-2 font-semibold flex justify-center">
-              Name
-            </div>
-            <div className="col-span-2 font-semibold flex justify-center">
-              Unit Price
-            </div>
-            <div className="col-span-2 font-semibold flex justify-center">
-              Total Price
-            </div>
-            <div className="col-span-2 font-semibold flex justify-center">
-              Price with Delivery
-            </div>
-            <div className="col-span-3 font-semibold flex justify-center">
-              Quantity
-            </div>
-            <div className="col-span-1 font-semibold flex justify-center">
-              Delete
-            </div>
+
+        {/* Table Header */}
+        <div className="grid grid-cols-10 gap-4 bg-gray-200 p-4 rounded-lg font-semibold text-textPrimary">
+          <div className="col-span-2 flex justify-center">Name</div>
+          <div className="col-span-1 flex justify-center">Unit Price</div>
+          <div className="col-span-1 flex justify-center">Total Price</div>
+          <div className="col-span-2 flex justify-center">
+            Price with Delivery
           </div>
+          <div className="col-span-2 flex justify-center">Quantity</div>
+          <div className="col-span-1 flex justify-center">Delete</div>
+          <div className="col-span-1 flex justify-center">Buy</div>
+        </div>
+
+        {/* Cart Items */}
+        <div className="space-y-4 mt-4">
           {cartItems.map((item, index) => (
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300"
+              className="bg-cardBg shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300"
             >
-              <ul className="grid grid-cols-12 gap-4 items-center">
+              <ul className="grid grid-cols-10 gap-4 items-center text-textPrimary">
                 <li className="col-span-2 text-lg font-medium flex justify-center">
                   {item.name}
                 </li>
-                <li className="col-span-2 text-lg font-medium flex justify-center">
+                <li className="col-span-1 text-lg font-medium flex justify-center">
                   Rs. {item.price}
                 </li>
-                <li className="col-span-2 text-lg font-medium flex justify-center">
+                <li className="col-span-1 text-lg font-medium flex justify-center text-nowrap">
                   Rs. {(item.price * item.quantity).toFixed(2)}
                 </li>
                 <li className="col-span-2 text-lg font-medium flex justify-center">
                   Rs. {(item.price * item.quantity + 50).toFixed(2)}
                 </li>
-                <li className="col-span-3 flex justify-center">
+                <li className="col-span-2 flex justify-center">
                   <Quantity
                     productId={item.productId}
                     initialQuantity={item.quantity}
-                    onQuantityChange={(newQuantity) => {
-                      handleQuantityChange(item.productId, newQuantity);
-                    }}
+                    onQuantityChange={(newQuantity) =>
+                      handleQuantityChange(item.productId, newQuantity)
+                    }
                   />
                 </li>
-                <button
-                  onClick={() => handleDelete(item.productId)}
-                  className="col-span-1 text-lg font-medium flex justify-center text-red-500"
-                >
-                  <ImCross />
-                </button>
+                <li className="col-span-1 flex justify-center">
+                  <DeleteCartItem
+                    onDelete={() => handleDelete(item.productId)}
+                  />
+                </li>
+                <li className="col-span-1 flex justify-center">
+                  <Buy productId={item.productId} />
+                </li>
               </ul>
             </div>
           ))}
