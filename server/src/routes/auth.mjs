@@ -4,7 +4,7 @@ const router = Router();
 
 router.get("/session", async (req, res) => {
   if (req.session && req.user) {
-    return res.json({ isAuthenticated: true, user: req.session.user });
+    return res.json({ isAuthenticated: true, user: req.user });
   } else {
     return res.json({ isAuthenticated: false });
   }

@@ -1,28 +1,11 @@
 "use client";
 
-// import type { Metadata } from "next";
 import Quantity from "../_components/Quantity";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "../_components/BackButton";
 import { ImCross } from "react-icons/im";
-
-// export const metadata: Metadata = {
-//   title: "Cart",
-// };
-
-// const cartItems = [
-//   { productId: 1, name: "Item 1", price: 10, quantity: 10 },
-//   { productId: 2, name: "Item 2", price: 20, quantity: 50 },
-//   { productId: 3, name: "Item 3", price: 30, quantity: 1 },
-//   { productId: 4, name: "Item 4", price: 40, quantity: 10 },
-//   { productId: 5, name: "Item 5", price: 50, quantity: 100 },
-//   { productId: 6, name: "Item 6", price: 60, quantity: 10 },
-//   { productId: 7, name: "Item 7", price: 70, quantity: 10 },
-//   { productId: 8, name: "Item 8", price: 80, quantity: 10 },
-//   { productId: 9, name: "Item 9", price: 90, quantity: 10 },
-//   { productId: 10, name: "Item 10", price: 100, quantity: 10 },
-// ];
+import { deleteCartItem, fetchCartItems } from "../_utils/products";
 
 export default function Cart() {
   const router = useRouter();
@@ -32,26 +15,16 @@ export default function Cart() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchCart() {
-      try {
-        const response = await fetch("http://localhost:8080/cart", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        const data = await response.json();
-        if (response.status === 401) {
-          router.replace("/login");
-        } else {
-          setCartItems(data);
-        }
-      } catch (error) {
-        console.error("Error fetching cart items", error);
-      } finally {
+    async function loadCart() {
+      const result = await fetchCartItems();
+      if (result.error === "unauthorized") {
+        router.replace("/login");
+      } else {
+        setCartItems(result.data || []);
         setLoading(false);
       }
     }
-    fetchCart();
+    loadCart();
   }, [router]);
 
   function handleQuantityChange(productId: string, newQuantity: number) {
@@ -62,29 +35,13 @@ export default function Cart() {
     );
   }
 
-  function handleDelete(productId: string) {
-    async function deleteItem() {
-      try {
-        const res = await fetch("http://localhost:8080/cart/delete", {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ productId }),
-        });
-        if (res.ok) {
-          setCartItems((prevCartItems) =>
-            prevCartItems.filter((item) => item.productId !== productId)
-          );
-        } else {
-          throw new Error("Failed to delete item");
-        }
-      } catch (error) {
-        console.error("Error deleting item", error);
-      }
+  async function handleDelete(productId: string) {
+    const success = await deleteCartItem(productId);
+    if (success) {
+      setCartItems((prevCartItems) =>
+        prevCartItems.filter((item) => item.productId !== productId)
+      );
     }
-    deleteItem();
   }
 
   if (loading) {

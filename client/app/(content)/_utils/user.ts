@@ -1,3 +1,19 @@
+export const checkLoggedIn = async () => {
+  try {
+    const res = await fetch("http://localhost:8080/session", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error checking login status", error);
+  }
+};
+
 export const signupUser = async (formData: { [key: string]: string }) => {
   try {
     const response = await fetch("http://localhost:8080/signup", {
@@ -37,5 +53,28 @@ export const loginUser = async (formData: { [key: string]: string }) => {
       success: false,
       error: "Login failed, please try again." + error,
     };
+  }
+};
+
+// Logout
+export const handleLogout = async () => {
+  try {
+    const res = await fetch("http://localhost:8080/logout", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (res.status === 500) {
+      return { success: false, error: "Logout failed" };
+    }
+    if (res.status === 200) {
+      return { success: true };
+    }
+    return { success: false, error: "Unexpected response from the server" };
+  } catch (error) {
+    console.error("Error occurred during logout", error);
+    return { success: false, error: "Network error during logout" };
   }
 };

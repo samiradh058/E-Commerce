@@ -7,6 +7,7 @@ import { IoIosMail, IoMdKey } from "react-icons/io";
 
 export default function LoginSignupModern() {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const loginSignup2Text = "Login";
   const loginSignup2Form = [
@@ -28,14 +29,41 @@ export default function LoginSignupModern() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const result = await loginUser(formData);
+  // Validate email and password fields
+  const validateForm = () => {
+    const formErrors: { [key: string]: string } = {};
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    if (!result.success) {
-      alert(result.error);
-    } else {
-      redirect("/");
+    // Validate email
+    if (!formData.email) {
+      formErrors.email = "Email is required";
+    } else if (!emailPattern.test(formData.email)) {
+      formErrors.email = "Please enter a valid email address";
+    }
+
+    // Validate password
+    if (!formData.password) {
+      formErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      formErrors.password = "Password must be at least 8 characters";
+    }
+
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0; // Return true if no errors
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Only proceed if the form is valid
+    if (validateForm()) {
+      const result = await loginUser(formData);
+
+      if (!result.success) {
+        alert(result.error);
+      } else {
+        redirect("/");
+      }
     }
   };
 
@@ -69,6 +97,9 @@ export default function LoginSignupModern() {
                   required
                 />
               </div>
+              {errors[field.name] && (
+                <p className="text-red-500 text-sm">{errors[field.name]}</p>
+              )}
             </div>
           ))}
           <button
