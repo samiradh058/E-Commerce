@@ -81,7 +81,7 @@ export default function AddToCart({ productId }: { productId: string }) {
   return (
     <button
       onClick={handleAddToCart}
-      className="w-full bg-pink-400 py-1 px-2 rounded-md"
+      className="w-full bg-pink-400 py-1 px-2 rounded-md text-nowrap"
       disabled={inCart}
     >
       {inCart ? "Added" : "Add to Cart"}

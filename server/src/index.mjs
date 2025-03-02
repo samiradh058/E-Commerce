@@ -52,6 +52,26 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+const restrictAdminOnPort3000 = (req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin === "http://localhost:3000" && req.user?.role === "admin") {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Logout failed" });
+      }
+
+      res.clearCookie("connect.sid"); // Clear session cookie
+      return res
+        .status(403)
+        .json({ message: "Admins cannot access port 3000" });
+    });
+  } else {
+    next();
+  }
+};
+
+app.use(restrictAdminOnPort3000);
+
 app.use(routes);
 
 app.listen(PORT, () => {

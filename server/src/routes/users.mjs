@@ -43,15 +43,26 @@ router.post("/signup", async (req, res) => {
 // Login
 router.post("/login", passport.authenticate("local"), async (req, res) => {
   try {
-    if (req.user.role === "admin") {
-      res
-        .status(200)
-        .json({ message: "Admin login successful", role: req.user.role });
-    } else {
-      res
-        .status(200)
-        .json({ message: "User login successful", role: req.user.role });
+    const origin = req.headers.origin;
+
+    // Restrict admin login to port 3001
+    if (origin === "http://localhost:3000" && req.user.role === "admin") {
+      return res
+        .status(403)
+        .json({ message: "Admins cannot log in from this port" });
     }
+
+    // Restrict user login to port 3000
+    if (origin === "http://localhost:3001" && req.user.role === "user") {
+      return res
+        .status(403)
+        .json({ message: "Users cannot log in from this port" });
+    }
+
+    res.status(200).json({
+      message: `${req.user.role} login successful`,
+      role: req.user.role,
+    });
   } catch (error) {
     res.status(500).json({ message: "Login failed" });
   }

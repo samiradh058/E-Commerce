@@ -55,9 +55,14 @@ export default function Cart() {
   }
   if (!cartItems.length)
     return (
-      <p className="flex justify-center text-[32px] font-bold">
-        Your cart is empty.
-      </p>
+      <>
+        <div>
+          <BackButton />
+        </div>
+        <p className="flex justify-center text-[32px] font-bold">
+          Your cart is empty.
+        </p>
+      </>
     );
 
   return (

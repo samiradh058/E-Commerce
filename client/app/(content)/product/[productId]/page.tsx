@@ -46,7 +46,7 @@ export default async function ProductPage({
       <div className="w-full md:w-[80%] mx-auto text-lg">
         <div className="flex flex-col md:flex-row justify-between items-center p-6 rounded-lg shadow-md bg-cardBg">
           <div className="flex flex-col md:flex-row gap-8 items-center w-full">
-            <div className="relative h-56 w-56 md:h-96 md:w-96">
+            <div className="relative h-96 w-[40%]">
               <Image
                 src="/logo.png"
                 alt="Image of product"
@@ -54,41 +54,49 @@ export default async function ProductPage({
                 className="object-cover rounded-lg"
               />
             </div>
-            <div className="flex flex-col gap-6 md:gap-8 flex-grow">
-              <div className="flex flex-col gap-4">
-                <h1 className="font-semibold text-xl md:text-2xl text-textPrimary">
-                  {product.name}
-                </h1>
-                <div className="italic text-base md:text-lg text-textSecondary">
-                  {product.description}
+            <div className="flex flex-col gap-6 flex-grow w-[60%]">
+              <div className="flex flex-col gap-6">
+                <div>
+                  <h1 className="font-semibold text-xl md:text-2xl text-textPrimary">
+                    {product.name}
+                  </h1>
+                  <div className="italic text-base md:text-lg text-textSecondary break-words">
+                    {product.description}
+                  </div>
+                  <div className="flex gap-2 items-center font-semibold text-xl text-textPrimary">
+                    <span>{product.rating}</span>
+                    {Array.from({ length: fullStars }).map((_, index) => (
+                      <FaStar key={index} className="text-yellow-400" />
+                    ))}
+                    {hasHalfStar && (
+                      <FaStarHalfAlt className="text-yellow-400" />
+                    )}
+                  </div>
                 </div>
-                <div className="flex gap-2 items-center font-semibold text-xl text-textPrimary">
-                  <span>{product.rating}</span>
-                  {Array.from({ length: fullStars }).map((_, index) => (
-                    <FaStar key={index} className="text-yellow-400" />
-                  ))}
-                  {hasHalfStar && <FaStarHalfAlt className="text-yellow-400" />}
+
+                <div>
+                  <Link href="#qna" className="text-info hover:underline">
+                    <span className="font-semibold text-xl">
+                      {product.qna.length}
+                    </span>{" "}
+                    Answered Questions
+                  </Link>
+                  <p className="text-base md:text-lg text-textSecondary">
+                    Brand:{" "}
+                    <span className="font-semibold">{product.brand}</span>
+                  </p>
+                  <p className="text-base md:text-lg text-textSecondary">
+                    Price:{" "}
+                    <span className="font-semibold">Rs. {product.price}</span>
+                  </p>
+                  <p className="text-base md:text-lg text-textSecondary">
+                    Quantity:{" "}
+                    <span className="font-semibold">{product.quantity}</span>
+                  </p>
                 </div>
-                <Link href="#qna" className="text-info hover:underline">
-                  <span className="font-semibold text-xl">
-                    {product.qna.length}
-                  </span>{" "}
-                  Answered Questions
-                </Link>
-                <p className="text-base md:text-lg text-textSecondary">
-                  Brand: <span className="font-semibold">{product.brand}</span>
-                </p>
-                <p className="text-base md:text-lg text-textSecondary">
-                  Price:{" "}
-                  <span className="font-semibold">Rs. {product.price}</span>
-                </p>
-                <p className="text-base md:text-lg text-textSecondary">
-                  Quantity:{" "}
-                  <span className="font-semibold">{product.quantity}</span>
-                </p>
               </div>
               <div className="flex justify-between items-center gap-6 w-full">
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col">
                   <AskQuestion productId={product.productId} />
                   <div className="flex gap-4 mt-4">
                     <AddToCart productId={product.productId} />
