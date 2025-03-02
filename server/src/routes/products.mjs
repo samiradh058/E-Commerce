@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Product } from "../mongoose/products.mjs";
 import { Cart } from "../mongoose/cartItem.mjs";
+import bcrypt from "bcrypt";
 
 const router = Router();
 // Fetch all products

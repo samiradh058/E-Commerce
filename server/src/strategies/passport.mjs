@@ -1,47 +1,47 @@
 import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import bcrypt from "bcrypt";
 import { User } from "../mongoose/users.mjs";
+import { Admin } from "../mongoose/admins.mjs";
+import bcrypt from "bcrypt";
+import { Strategy as LocalStrategy } from "passport-local";
 
-passport.serializeUser((user, done) => {
-  console.log("Serializing user:", user._id);
-  done(null, user._id);
-});
-
-passport.deserializeUser(async (_id, done) => {
-  try {
-    const user = await User.findById(_id);
-    if (!user) {
-      throw new Error("User not found");
-    }
-    done(null, user);
-  } catch (err) {
-    console.error("Error in deserializing user:", err);
-    done(err, null);
-  }
-});
-
+// Define Passport Local Strategy
 passport.use(
   new LocalStrategy(
-    { usernameField: "email" },
+    {
+      usernameField: "email", // Use email as the username
+    },
     async (email, password, done) => {
-      const user = await User.findOne({ email });
+      try {
+        // Check if the user is an admin first
+        let user = await Admin.findOne({ email });
+        if (!user) {
+          // If not an admin, check in the user collection
+          user = await User.findOne({ email });
+        }
 
-      if (!user) {
-        return done(null, false, {
-          message: "User not found, error coming from local-strategy.mjs",
-        });
-      }
+        if (!user) {
+          return done(null, false, { message: "Invalid email or password" });
+        }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return done(null, false, {
-          message: "Incorrect password, error coming from local-strategy.mjs",
-        });
+        // Compare passwords
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return done(null, false, { message: "Invalid email or password" });
+        }
+
+        return done(null, user);
+      } catch (err) {
+        return done(err);
       }
-      return done(null, user);
     }
   )
 );
 
-export default passport;
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  const user = (await User.findById(id)) || (await Admin.findById(id));
+  done(null, user);
+});

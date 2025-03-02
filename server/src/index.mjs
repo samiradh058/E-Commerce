@@ -6,10 +6,11 @@ import passport from "passport";
 import MongoStore from "connect-mongo";
 import routes from "./routes/index.mjs";
 import "./strategies/passport.mjs";
-import { Product } from "./mongoose/products.mjs";
 
 const app = express();
 const PORT = 8080;
+
+const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
 
 mongoose
   .connect("mongodb://localhost:27017/e-commerce")
@@ -18,7 +19,19 @@ mongoose
   })
   .catch((err) => console.log(err));
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true); // Allow the request
+    } else {
+      callback(new Error("Not allowed by CORS")); // Reject the request
+    }
+  },
+  credentials: true, // Allow cookies to be sent with requests
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 app.use(
