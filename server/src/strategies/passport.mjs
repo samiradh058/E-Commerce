@@ -14,12 +14,15 @@ passport.use(
       try {
         // Check if the user is an admin first
         let user = await Admin.findOne({ email });
+        console.log("User is admin");
         if (!user) {
           // If not an admin, check in the user collection
           user = await User.findOne({ email });
+          console.log("User is user");
         }
 
         if (!user) {
+          console.log("No user");
           return done(null, false, { message: "Invalid email or password" });
         }
 

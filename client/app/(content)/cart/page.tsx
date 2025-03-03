@@ -20,6 +20,8 @@ export default function Cart() {
       const result = await fetchCartItems();
       if (result.error === "unauthorized") {
         router.replace("/login");
+      } else if (result === "Admin donot have a cart") {
+        router.replace("/");
       } else {
         setCartItems(result.data || []);
         setLoading(false);

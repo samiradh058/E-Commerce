@@ -63,6 +63,9 @@ router.get("/cart", async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized, Login first!" });
     }
+    if (req.user.role === "admin") {
+      return res.status(200).json({ message: "Admin donot have a cart" });
+    }
     const cart = await Cart.find({ userId: req.user._id });
     if (!cart.length) {
       return res.status(404).json({ message: "Product not found" });

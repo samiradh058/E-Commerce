@@ -45,6 +45,10 @@ export async function fetchCartItems() {
 
     const data = await response.json();
 
+    if (data.message === "Admin donot have a cart") {
+      return data.message;
+    }
+
     return { data };
   } catch (error) {
     console.error("Error fetching cart items", error);

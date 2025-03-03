@@ -13,9 +13,14 @@ export default function Footer() {
   >([]);
   const pathname = usePathname();
 
+  const [admin, setAdmin] = useState(false);
+
   useEffect(() => {
     async function loadCart() {
       const result = await fetchCartItems();
+      if (result === "Admin donot have a cart") {
+        setAdmin(true);
+      }
       setCartItems(result.data || []);
     }
 
@@ -25,6 +30,10 @@ export default function Footer() {
   const totalPrice = cartItems.length
     ? cartItems.reduce((acc, item) => acc + item.price * item.quantity + 50, 0)
     : 0;
+
+  if (admin) {
+    return;
+  }
 
   return (
     pathname !== "/cart" && (
