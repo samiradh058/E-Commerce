@@ -47,8 +47,6 @@ router.post("/product/qna", async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    console.log("Product ", product);
-    console.log("Question to push :", { question, answer: "" });
     product.qna.push({ question, answer: "" });
     await product.save();
     res.status(201).json({ message: "Question added successfully" });
@@ -82,7 +80,6 @@ router.get("/cart", async (req, res) => {
       })
     );
 
-    console.log("Cart items:", cartItems);
     return res.status(200).json(cartItems);
   } catch (error) {
     console.error("Error fetching cart items:", error);
@@ -124,19 +121,32 @@ router.put("/cart/update", async (req, res) => {
       return res.status(404).json({ message: "Product not found in cart" });
     }
 
+    let product = await Product.findOne({ productId });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
     if (action === "increase") {
-      cartItem.quantity += 1;
+      if (product.quantity > 0) {
+        cartItem.quantity += 1;
+        product.quantity -= 1;
+      } else {
+        return res.status(400).json({ message: "Out of stock" });
+      }
     } else if (action === "decrease" && cartItem.quantity > 1) {
       cartItem.quantity -= 1;
+      product.quantity += 1;
     } else {
       return res.status(400).json({ message: "Invalid action" });
     }
-    console.log("Updated quantity before saving:", cartItem.quantity);
 
     await cartItem.save();
+    await product.save();
+
     return res.status(201).json({
       message: "Quantity updated successfully",
       updatedQuantity: cartItem.quantity,
+      remainingStock: product.quantity,
     });
   } catch (error) {
     console.error("Error updating cart item:", error);

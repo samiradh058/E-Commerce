@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { getProducts } from "../_utils/products";
+import { useEffect, useState } from "react";
 
 interface Product {
   productId: string;
@@ -44,11 +48,23 @@ function EachProduct({
   );
 }
 
-export default function Products({ items }: { items: Product[] }) {
+export default function Products() {
+  const [products, setProducts] = useState<Product[]>([]);
+
+  async function fetchProducts() {
+    const data = await getProducts();
+    setProducts(data);
+  }
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
     <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-      {items.length > 0 &&
-        items.map((item) => <EachProduct key={item.productId} {...item} />)}
+      {products.length > 0 &&
+        products.map((product: Product) => (
+          <EachProduct key={product.productId} {...product} />
+        ))}
     </ul>
   );
 }

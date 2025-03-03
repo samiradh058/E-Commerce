@@ -90,6 +90,7 @@ export async function updateQuantity(
 
     if (res.ok) {
       const { updatedQuantity } = await res.json();
+
       return updatedQuantity;
     } else {
       console.error("Error updating quantity");
