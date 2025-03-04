@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { Product } from "../mongoose/products.mjs";
 import { Cart } from "../mongoose/cartItem.mjs";
-import bcrypt from "bcrypt";
 
 const router = Router();
 // Fetch all products
@@ -96,9 +95,16 @@ router.post("/cart", async (req, res) => {
 
   const { productId } = req.body;
 
+  let product = await Product.findOne({ productId });
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
   try {
     const cartItem = new Cart({ userId, productId });
+    product.quantity -= 1;
     await cartItem.save();
+    await product.save();
     return res.status(200).json({ message: "Product added to cart" });
   } catch (error) {
     console.error("Error adding product to cart:", error);
@@ -167,6 +173,16 @@ router.delete("/cart/delete", async (req, res) => {
     if (!deletedItem) {
       return res.status(404).json({ message: "Product not found in cart" });
     }
+
+    let product = await Product.findOne({ productId });
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.quantity += deletedItem.quantity;
+    await product.save();
+
     res.status(200).json({ message: "Product removed from cart" });
   } catch (error) {
     console.error("Error deleting cart item:", error);

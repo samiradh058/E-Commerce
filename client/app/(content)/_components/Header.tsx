@@ -7,19 +7,26 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { checkLoggedIn } from "../_utils/user";
 import UserLogout from "./UserLogout";
+import Add_Admin from "./Add_admin";
 
 export default function Header() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string } | null>(
-    null
-  );
+  const [user, setUser] = useState<{
+    name: string;
+    email: string;
+    role: string;
+  } | null>(null);
 
   useEffect(() => {
     async function checkLogin() {
       const data = await checkLoggedIn();
       if (data && data.isAuthenticated) {
         setLoggedIn(true);
-        setUser({ name: data.user.name, email: data.user.email });
+        setUser({
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role,
+        });
       }
     }
     checkLogin();
@@ -43,7 +50,14 @@ export default function Header() {
 
       <Search />
 
-      {loggedIn && user ? <UserLogout user={user} /> : <Login_Singup />}
+      {loggedIn && user ? (
+        <div className="flex items-center gap-2">
+          <UserLogout user={user} />{" "}
+          {user?.role === "admin" ? <Add_Admin /> : ""}{" "}
+        </div>
+      ) : (
+        <Login_Singup />
+      )}
     </div>
   );
 }

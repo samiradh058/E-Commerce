@@ -80,3 +80,24 @@ export const handleLogout = async () => {
     return { success: false, error: "Network error during logout" };
   }
 };
+
+// Add new Admin
+export const addAdmin = async (formDaa: { [key: string]: string }) => {
+  try {
+    const response = await fetch("http://localhost:8080/add_admin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formDaa),
+      credentials: "include",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return { success: false, error: data.message || "Failed to add admin" };
+    }
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error occurred during adding admin", error);
+  }
+};
