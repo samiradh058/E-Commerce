@@ -189,4 +189,38 @@ router.delete("/cart/delete", async (req, res) => {
   }
 });
 
+// Add product
+router.post("/add_product", async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(401).json({ message: "Only admin can add product" });
+    }
+    const { name, price, quantity, category, description, image, qna } =
+      req.body;
+
+    if (!name || !price || !quantity || !category || !description) {
+      return res.status(400).json({ message: "Please fill all fields" });
+    }
+    let product = new Product({
+      productId: `prod_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 5)}`,
+      name,
+      price,
+      quantity,
+      category,
+      description,
+      image: image || "",
+      qna: qna || [],
+    });
+    const savedProduct = await product.save();
+    return res
+      .status(200)
+      .json({ message: "Product added successfully", product: savedProduct });
+  } catch (error) {
+    console.error("Error adding product:", error);
+    return res.status(500).json({ message: "Failed to add product" });
+  }
+});
+
 export default router;

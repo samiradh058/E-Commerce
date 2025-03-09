@@ -82,14 +82,14 @@ export const handleLogout = async () => {
 };
 
 // Add new Admin
-export const addAdmin = async (formDaa: { [key: string]: string }) => {
+export const addAdmin = async (formData: { [key: string]: string }) => {
   try {
     const response = await fetch("http://localhost:8080/add_admin", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formDaa),
+      body: JSON.stringify(formData),
       credentials: "include",
     });
     const data = await response.json();

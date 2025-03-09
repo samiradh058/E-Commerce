@@ -99,3 +99,25 @@ export async function updateQuantity(
     console.error("Error updating quantity", error);
   }
 }
+
+// Add product
+export async function addProduct(formData: { [key: string]: string | number }) {
+  try {
+    const response = await fetch("http://localhost:8080/add_product", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+      credentials: "include",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return { success: false, error: data.message || "Failed to add product" };
+    }
+    return { success: true, product: data.product };
+  } catch (error) {
+    console.error("Error adding product", error);
+    return { success: false, error: "Error adding product" };
+  }
+}
