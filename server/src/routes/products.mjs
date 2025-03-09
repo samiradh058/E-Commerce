@@ -223,4 +223,21 @@ router.post("/add_product", async (req, res) => {
   }
 });
 
+router.delete("/delete_product", async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(401).json({ message: "Only admin can delete product" });
+    }
+    const { productId } = req.body;
+    const deletedProduct = await Product.findOneAndDelete({ productId });
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    return res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return res.status(500).json({ message: "Failed to delete product" });
+  }
+});
+
 export default router;

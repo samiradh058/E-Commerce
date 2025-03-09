@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { getProducts } from "../_utils/products";
+import { deleteProduct, getProducts } from "../_utils/products";
 import { addProduct } from "../_utils/products";
 import { useEffect, useState } from "react";
 import { checkLoggedIn } from "../_utils/user";
+import { MdDelete } from "react-icons/md";
 
 interface Product {
   productId: string;
@@ -15,6 +16,8 @@ interface Product {
   description: string;
   category: string;
   quantity: number;
+  onDelete: (productId: string) => void;
+  isAdmin: boolean;
 }
 
 function EachProduct({
@@ -25,28 +28,48 @@ function EachProduct({
   description,
   category,
   quantity,
+  onDelete,
+  isAdmin,
 }: Product) {
   return (
-    <Link
-      href={`/product/${productId}`}
-      key={productId}
-      className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-transform duration-300"
-    >
-      <div className="relative h-56 w-full">
-        <Image src="/icon.png" alt="Item" fill className="object-cover" />
-      </div>
-      <div className="p-4">
-        <div className="flex justify-between">
-          <h3 className="text-lg font-semibold mb-1">{name}</h3>
-          <p className="px-1 border-gray-300 border-2 h-fit rounded-md">
-            {category}
-          </p>
+    <div className="relative group">
+      <Link
+        href={`/product/${productId}`}
+        key={productId}
+        className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-transform duration-300"
+      >
+        <div className="relative h-56 w-full">
+          <Image src="/icon.png" alt="Item" fill className="object-cover" />
         </div>
-        <p className="mb-1 text-stone-600">{description}</p>
-        <p className="text-stone-900 font-semibold">Rs. {price}</p>
-        <p className="text-stone-600">{quantity} remaining</p>
-      </div>
-    </Link>
+        <div className="p-4">
+          <div className="flex justify-between">
+            <h3 className="text-lg font-semibold mb-1">{name}</h3>
+            <p className="px-1 border-gray-300 border-2 h-fit rounded-md">
+              {category}
+            </p>
+          </div>
+          <p className="mb-1 text-stone-600">{description}</p>
+          <p className="text-stone-900 font-semibold">Rs. {price}</p>
+          <p className="text-stone-600">{quantity} remaining</p>
+        </div>
+      </Link>
+
+      {isAdmin && (
+        <div className="absolute top-0 right-0 flex gap-2">
+          <button
+            onClick={() => onDelete(productId)}
+            className="bg-red-500 text-white px-2 py-1 rounded-md opacity-0 group-hover:opacity-100"
+          >
+            <MdDelete />
+          </button>
+          {/* <Link href={`/admin/edit-product/${productId}`}>
+            <button className="bg-blue-500 text-white px-3 py-1 rounded-md">
+              Edit
+            </button>
+          </Link> */}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -70,6 +93,19 @@ export default function Products() {
   async function fetchUser() {
     const data = await checkLoggedIn();
     setUserRole(data.user.role);
+  }
+
+  async function deleteSpecificProduct(productId: string) {
+    if (!confirm("Are you sure you want to delete this item?")) return;
+
+    const data = await deleteProduct(productId);
+    if (data.success) {
+      setProducts(
+        products.filter((product) => product.productId !== productId)
+      );
+    } else {
+      alert("Failed to delete product");
+    }
   }
 
   useEffect(() => {
@@ -106,7 +142,12 @@ export default function Products() {
       <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {products.length > 0 &&
           products.map((product: Product) => (
-            <EachProduct key={product.name} {...product} />
+            <EachProduct
+              key={product.name}
+              {...product}
+              onDelete={deleteSpecificProduct}
+              isAdmin={userRole === "admin"}
+            />
           ))}
       </ul>
 

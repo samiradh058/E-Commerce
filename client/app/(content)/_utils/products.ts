@@ -121,3 +121,27 @@ export async function addProduct(formData: { [key: string]: string | number }) {
     return { success: false, error: "Error adding product" };
   }
 }
+
+export async function deleteProduct(productId: string) {
+  try {
+    const response = await fetch(`http://localhost:8080/delete_product`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ productId }),
+      credentials: "include",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.message || "Failed to delete product",
+      };
+    }
+    return { success: true, product: data.product };
+  } catch (error) {
+    console.error("Error deleting product", error);
+    return { success: false, error: "Error deleting product" };
+  }
+}
