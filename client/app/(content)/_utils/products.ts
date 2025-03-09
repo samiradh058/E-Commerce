@@ -145,3 +145,33 @@ export async function deleteProduct(productId: string) {
     return { success: false, error: "Error deleting product" };
   }
 }
+
+export async function updateProduct(
+  productId: string,
+  updatedProduct: { [key: string]: string | number }
+) {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/update_product/${productId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedProduct),
+        credentials: "include",
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      return { success: true, data: data.product };
+    } else {
+      return { success: false, error: "Error deleting product" };
+    }
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return { success: false, error: "Error updating product" };
+  }
+}

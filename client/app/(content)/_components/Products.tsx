@@ -1,86 +1,37 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { deleteProduct, getProducts } from "../_utils/products";
-import { addProduct } from "../_utils/products";
+import {
+  deleteProduct,
+  getProducts,
+  addProduct,
+  updateProduct,
+} from "../_utils/products";
 import { useEffect, useState } from "react";
 import { checkLoggedIn } from "../_utils/user";
-import { MdDelete } from "react-icons/md";
+import EachProduct from "./EachProduct";
 
 interface Product {
   productId: string;
   name: string;
   price: number;
-  image: string;
+  // image: string;
   description: string;
   category: string;
   quantity: number;
   onDelete: (productId: string) => void;
+  onEdit: (product: Product) => void;
   isAdmin: boolean;
-}
-
-function EachProduct({
-  productId,
-  name,
-  price,
-  // image,
-  description,
-  category,
-  quantity,
-  onDelete,
-  isAdmin,
-}: Product) {
-  return (
-    <div className="relative group">
-      <Link
-        href={`/product/${productId}`}
-        key={productId}
-        className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-transform duration-300"
-      >
-        <div className="relative h-56 w-full">
-          <Image src="/icon.png" alt="Item" fill className="object-cover" />
-        </div>
-        <div className="p-4">
-          <div className="flex justify-between">
-            <h3 className="text-lg font-semibold mb-1">{name}</h3>
-            <p className="px-1 border-gray-300 border-2 h-fit rounded-md">
-              {category}
-            </p>
-          </div>
-          <p className="mb-1 text-stone-600">{description}</p>
-          <p className="text-stone-900 font-semibold">Rs. {price}</p>
-          <p className="text-stone-600">{quantity} remaining</p>
-        </div>
-      </Link>
-
-      {isAdmin && (
-        <div className="absolute top-0 right-0 flex gap-2">
-          <button
-            onClick={() => onDelete(productId)}
-            className="bg-red-500 text-white px-2 py-1 rounded-md opacity-0 group-hover:opacity-100"
-          >
-            <MdDelete />
-          </button>
-          {/* <Link href={`/admin/edit-product/${productId}`}>
-            <button className="bg-blue-500 text-white px-3 py-1 rounded-md">
-              Edit
-            </button>
-          </Link> */}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [userRole, setUserRole] = useState<string>("user");
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: 0,
-    image: "",
+    // image: "",
     description: "",
     category: "All",
     quantity: 0,
@@ -95,6 +46,11 @@ export default function Products() {
     setUserRole(data.user.role);
   }
 
+  useEffect(() => {
+    fetchProducts();
+    fetchUser();
+  }, []);
+
   async function deleteSpecificProduct(productId: string) {
     if (!confirm("Are you sure you want to delete this item?")) return;
 
@@ -108,22 +64,57 @@ export default function Products() {
     }
   }
 
-  useEffect(() => {
-    fetchProducts();
-    fetchUser();
-  }, []);
-
   async function handleAddProduct() {
     try {
       const data = await addProduct(newProduct);
       if (data) {
-        console.log("data after handling is ", data);
         setProducts([...products, data.product]);
-        console.log("products are after adding ", products);
         setShowModal(false);
       }
     } catch (error) {
       console.error("Error adding product:", error);
+    }
+  }
+
+  function editProduct(product: Product) {
+    setCurrentProduct(product);
+    setNewProduct({
+      name: product.name,
+      price: product.price,
+      // image: product.image,
+      description: product.description,
+      category: product.category,
+      quantity: product.quantity,
+    });
+    setShowModal(true);
+  }
+
+  async function handleEditProduct() {
+    if (!currentProduct) return;
+
+    try {
+      const data = await updateProduct(currentProduct.productId, newProduct);
+      if (data.success) {
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.productId === currentProduct.productId
+              ? { ...product, ...newProduct }
+              : product
+          )
+        );
+        setCurrentProduct(null);
+        setShowModal(false);
+        setNewProduct({
+          name: "",
+          price: 0,
+          // image: "",
+          description: "",
+          category: "All",
+          quantity: 0,
+        });
+      }
+    } catch (error) {
+      console.error("Error editing product:", error);
     }
   }
 
@@ -143,9 +134,10 @@ export default function Products() {
         {products.length > 0 &&
           products.map((product: Product) => (
             <EachProduct
-              key={product.name}
+              key={product.productId}
               {...product}
               onDelete={deleteSpecificProduct}
+              onEdit={editProduct}
               isAdmin={userRole === "admin"}
             />
           ))}
@@ -154,7 +146,9 @@ export default function Products() {
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-md shadow-md w-96">
-            <h2 className="text-lg font-semibold mb-4">Add New Product</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              {currentProduct ? "Edit Product" : "Add New Product"}
+            </h2>
 
             <input
               type="text"
@@ -210,7 +204,7 @@ export default function Products() {
               <option value="woman">Woman</option>
             </select>
 
-            <input
+            {/* <input
               type="text"
               placeholder="Image URL"
               value={newProduct.image}
@@ -218,20 +212,31 @@ export default function Products() {
                 setNewProduct({ ...newProduct, image: e.target.value })
               }
               className="w-full p-2 border rounded mb-2"
-            />
+            /> */}
 
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => (
+                  setShowModal(false),
+                  setCurrentProduct(null),
+                  setNewProduct({
+                    name: "",
+                    price: 0,
+                    // image: "",
+                    description: "",
+                    category: "All",
+                    quantity: 0,
+                  })
+                )}
                 className="px-4 py-2 bg-gray-300 rounded-md"
               >
                 Cancel
               </button>
               <button
-                onClick={handleAddProduct}
+                onClick={currentProduct ? handleEditProduct : handleAddProduct}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md"
               >
-                Add
+                {currentProduct ? "Update" : "Add"}
               </button>
             </div>
           </div>

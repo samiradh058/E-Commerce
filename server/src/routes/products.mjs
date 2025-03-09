@@ -223,6 +223,7 @@ router.post("/add_product", async (req, res) => {
   }
 });
 
+// Delete product
 router.delete("/delete_product", async (req, res) => {
   try {
     if (!req.user || req.user.role !== "admin") {
@@ -237,6 +238,34 @@ router.delete("/delete_product", async (req, res) => {
   } catch (error) {
     console.error("Error deleting product:", error);
     return res.status(500).json({ message: "Failed to delete product" });
+  }
+});
+
+// Update product
+router.put("/update_product/:productId", async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(401).json({ message: "Only admin can update product" });
+    }
+    const { productId } = req.params;
+    const { name, price, quantity, category, description, image, qna } =
+      req.body;
+
+    const updatedProduct = await Product.findOneAndUpdate(
+      { productId },
+      { $set: { name, price, quantity, category, description, image, qna } },
+      { new: true }
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    return res.status(200).json({
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
