@@ -101,3 +101,23 @@ export const addAdmin = async (formData: { [key: string]: string }) => {
     console.error("Error occurred during adding admin", error);
   }
 };
+
+// Fetch Users
+export const fetchUsers = async () => {
+  try {
+    const response = await fetch("http://localhost:8080/users", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return { success: false, error: data.message || "Failed to fetch users" };
+    }
+    return { success: true, data: data.users };
+  } catch (error) {
+    console.error("Error occurred during fetching users", error);
+  }
+};

@@ -119,4 +119,19 @@ router.post("/add_admin", async (req, res) => {
   }
 });
 
+// Get Users
+router.get("/users", async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Only admins can view users" });
+    }
+    const users = await User.find();
+    return res.status(200).json({ users });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error occured while fetching users" });
+  }
+});
+
 export default router;
