@@ -19,6 +19,7 @@ interface Product {
   description: string;
   category: string;
   quantity: number;
+  qna: { question: string; answer: string }[];
   onDelete: (productId: string) => void;
   onEdit: (product: Product) => void;
   isAdmin: boolean;
@@ -30,13 +31,16 @@ export default function Products() {
   const [userRole, setUserRole] = useState<string>("user");
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
-  const [newProduct, setNewProduct] = useState({
+  const [newProduct, setNewProduct] = useState<
+    Omit<Product, "onDelete" | "onEdit" | "isAdmin" | "productId">
+  >({
     name: "",
     price: 0,
     // image: "",
     description: "",
     category: "All",
     quantity: 0,
+    qna: [],
   });
   const [priceFilter, setPriceFilter] = useState({ min: 0, max: Infinity });
   const [category, setCategory] = useState("All");
@@ -120,7 +124,10 @@ export default function Products() {
 
   async function handleAddProduct() {
     try {
-      const data = await addProduct(newProduct);
+      const data = await addProduct({
+        ...newProduct,
+        qna: JSON.stringify(newProduct.qna),
+      });
       if (data) {
         setProducts([...products, data.product]);
         setShowModal(false);
@@ -131,6 +138,7 @@ export default function Products() {
           description: "",
           category: "All",
           quantity: 0,
+          qna: [],
         });
       }
     } catch (error) {
@@ -147,6 +155,7 @@ export default function Products() {
       description: product.description,
       category: product.category,
       quantity: product.quantity,
+      qna: product.qna,
     });
     setShowModal(true);
   }
@@ -173,6 +182,7 @@ export default function Products() {
           description: "",
           category: "All",
           quantity: 0,
+          qna: [],
         });
       }
     } catch (error) {
@@ -276,76 +286,129 @@ export default function Products() {
       </ul>
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-md shadow-md w-96">
-            <h2 className="text-lg font-semibold mb-4">
+          <div className="bg-white p-6 rounded-md shadow-md w-[60%]">
+            <h2 className="text-lg font-semibold mb-4 flex justify-center">
               {currentProduct ? "Edit Product" : "Add New Product"}
             </h2>
+            <div className="flex justify-around gap-4">
+              <div>
+                <div className="mt-2">
+                  <label htmlFor="name">Name:</label>
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={newProduct.name}
+                    onChange={(e) =>
+                      setNewProduct({ ...newProduct, name: e.target.value })
+                    }
+                    className="w-full p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all"
+                  />
+                </div>
 
-            <input
-              type="text"
-              placeholder="Name"
-              value={newProduct.name}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, name: e.target.value })
-              }
-              className="w-full p-2 border rounded mb-2"
-            />
-            <input
-              type="number"
-              placeholder="Price"
-              value={newProduct.price}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, price: Number(e.target.value) })
-              }
-              className="w-full p-2 border rounded mb-2"
-            />
-            <input
-              type="number"
-              placeholder="Quantity"
-              value={newProduct.quantity}
-              onChange={(e) =>
-                setNewProduct({
-                  ...newProduct,
-                  quantity: Number(e.target.value),
-                })
-              }
-              className="w-full p-2 border rounded mb-2"
-            />
-            <input
-              type="text"
-              placeholder="Description"
-              value={newProduct.description}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, description: e.target.value })
-              }
-              className="w-full p-2 border rounded mb-2"
-            />
+                <div className="mt-2">
+                  <label htmlFor="price" className="text-gray-700">
+                    Price:
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Price"
+                    value={newProduct.price}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        price: Number(e.target.value),
+                      })
+                    }
+                    className="w-full p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all"
+                  />
+                </div>
 
-            <select
-              name="category"
-              id="category"
-              value={newProduct.category}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, category: e.target.value })
-              }
-              className="w-full p-2 border rounded mb-2"
-            >
-              <option value="All">All</option>
-              <option value="Man">Man</option>
-              <option value="Woman">Woman</option>
-            </select>
+                <div className="mt-2">
+                  <label htmlFor="quantity" className="text-gray-700">
+                    Quantity:
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Quantity"
+                    value={newProduct.quantity}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        quantity: Number(e.target.value),
+                      })
+                    }
+                    className="w-full p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all"
+                  />
+                </div>
 
-            {/* <input
-              type="text"
-              placeholder="Image URL"
-              value={newProduct.image}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, image: e.target.value })
-              }
-              className="w-full p-2 border rounded mb-2"
-            /> */}
+                <div className="mt-2">
+                  <label htmlFor="description" className="text-gray-700">
+                    Description:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Description"
+                    value={newProduct.description}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        description: e.target.value,
+                      })
+                    }
+                    className="w-full p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all"
+                  />
+                </div>
 
-            <div className="flex justify-end gap-2">
+                <div className="mt-2">
+                  <label htmlFor="category" className="text-gray-700">
+                    Category:
+                  </label>
+                  <select
+                    name="category"
+                    id="category"
+                    value={newProduct.category}
+                    onChange={(e) =>
+                      setNewProduct({ ...newProduct, category: e.target.value })
+                    }
+                    className="w-full p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all"
+                  >
+                    <option value="All">All</option>
+                    <option value="Man">Man</option>
+                    <option value="Woman">Woman</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <div className="mt-2">
+                  <label htmlFor="qna" className="text-gray-700">
+                    Questions:
+                  </label>
+                  {newProduct.qna.map((qnaItem, index) => (
+                    <div key={index} style={{ marginBottom: "10px" }}>
+                      <label>{qnaItem.question}</label>
+                      <input
+                        type="text"
+                        value={qnaItem.answer}
+                        onChange={(e) => {
+                          setNewProduct((prevProduct) => ({
+                            ...prevProduct,
+                            qna: prevProduct.qna.map((item, i) =>
+                              i === index
+                                ? { ...item, answer: e.target.value }
+                                : item
+                            ),
+                          }));
+                        }}
+                        placeholder="Enter your answer"
+                        className="w-full p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => (
                   setShowModal(false),
@@ -357,6 +420,7 @@ export default function Products() {
                     description: "",
                     category: "All",
                     quantity: 0,
+                    qna: [],
                   })
                 )}
                 className="px-4 py-2 bg-gray-300 rounded-md"

@@ -148,7 +148,9 @@ export async function deleteProduct(productId: string) {
 
 export async function updateProduct(
   productId: string,
-  updatedProduct: { [key: string]: string | number }
+  updatedProduct: {
+    [key: string]: string | number | { question: string; answer: string }[];
+  }
 ) {
   try {
     const response = await fetch(
@@ -168,7 +170,7 @@ export async function updateProduct(
     if (response.ok) {
       return { success: true, data: data.product };
     } else {
-      return { success: false, error: "Error deleting product" };
+      return { success: false, error: "Error updating product" };
     }
   } catch (error) {
     console.error("Error updating product:", error);

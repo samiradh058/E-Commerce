@@ -11,6 +11,7 @@ interface Product {
   description: string;
   category: string;
   quantity: number;
+  qna: { question: string; answer: string }[];
   onDelete: (productId: string) => void;
   onEdit: (product: Product) => void;
   isAdmin: boolean;
@@ -24,6 +25,7 @@ export default function EachProduct({
   description,
   category,
   quantity,
+  qna,
   onDelete,
   onEdit,
   isAdmin,
@@ -71,6 +73,7 @@ export default function EachProduct({
                 description,
                 category,
                 quantity,
+                qna,
                 onDelete,
                 onEdit,
                 isAdmin,

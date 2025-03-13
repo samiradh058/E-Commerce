@@ -1,12 +1,10 @@
-import AddToCart from "@/app/(content)/_components/AddToCart";
 import QnA from "@/app/(content)/_components/QnA";
 import Image from "next/image";
 import Link from "next/link";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { getProductFromId } from "../../_utils/products";
 import BackButton from "../../_components/BackButton";
-import AskQuestion from "../../_components/AskQuestion";
-import Buy from "../../_components/Buy";
+import QnA_Buy_Add from "../../_components/QnA_Buy_Add";
 
 export default async function ProductPage({
   params,
@@ -17,23 +15,6 @@ export default async function ProductPage({
 }) {
   const param = await params;
   const product = await getProductFromId(param.productId);
-
-  // const product = {
-  //   name: "Product 1",
-  //   description: "Very comfortable and stylish product",
-  //   rating: 4.5,
-  //   qna: [
-  //     {
-  //       Question: "What?",
-  //       Answer: "This is a product",
-  //     },
-  //     { Question: "How?", Answer: "This is a product" },
-  //     { Question: "Why?", Answer: "This is a product" },
-  //   ],
-  //   brand: "Brand 1",
-  //   price: 100,
-  //   quantity: 10,
-  // };
 
   const fullStars = Math.floor(product.rating);
   const hasHalfStar = product.rating % 1 !== 0;
@@ -77,8 +58,13 @@ export default async function ProductPage({
                 <div>
                   <Link href="#qna" className="text-info hover:underline">
                     <span className="font-semibold text-xl">
-                      {product.qna.length}
-                    </span>{" "}
+                      {
+                        product.qna.filter(
+                          (q: { question: string; answer: string }) =>
+                            q.answer.trim() !== ""
+                        ).length
+                      }
+                    </span>
                     Answered Questions
                   </Link>
                   <p className="text-base md:text-lg text-textSecondary">
@@ -96,13 +82,7 @@ export default async function ProductPage({
                 </div>
               </div>
               <div className="flex justify-between items-center gap-6 w-full">
-                <div className="flex flex-col">
-                  <AskQuestion productId={product.productId} />
-                  <div className="flex gap-4 mt-4">
-                    <AddToCart productId={product.productId} />
-                    <Buy productId={product.productId} />
-                  </div>
-                </div>
+                <QnA_Buy_Add productId={product.productId} />
                 <div className="flex flex-col">
                   <p className="text-lg text-textSecondary mb-2">
                     Delivery Options

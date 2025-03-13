@@ -20,8 +20,6 @@ export default function Footer() {
     | undefined
   >(undefined);
 
-  console.log(users);
-
   const pathname = usePathname();
 
   const [admin, setAdmin] = useState(false);

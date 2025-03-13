@@ -7,6 +7,7 @@ interface QnAProps {
   qna: QnAItem[];
 }
 export default function QnA({ qna }: QnAProps) {
+  console.log("qna form each qna is ", qna);
   return (
     <div className="mt-8 w-full">
       <h2 className="font-semibold text-[20px] mb-4">
