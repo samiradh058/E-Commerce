@@ -9,6 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import { checkLoggedIn } from "../_utils/user";
 import EachProduct from "./EachProduct";
+import Spinner from "./Spinner";
 
 interface Product {
   productId: string;
@@ -25,6 +26,7 @@ interface Product {
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [userRole, setUserRole] = useState<string>("user");
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
@@ -42,60 +44,65 @@ export default function Products() {
   const [sort, setSort] = useState("");
 
   useEffect(() => {
-    async function fetchProducts() {
-      const data = await getProducts();
-      const filteredProducts = data.filter(
-        (item: Product) =>
-          item.price >= priceFilter.min &&
-          item.price <= (priceFilter.max || Infinity)
-      );
-      const categorisedProducts =
-        category === "All"
-          ? filteredProducts
-          : filteredProducts.filter(
-              (item: Product) => item.category === category
-            );
-      const searchedProducts =
-        search.trim() === ""
-          ? categorisedProducts
-          : categorisedProducts.filter((item: Product) =>
-              item.name.toLowerCase().includes(search.toLowerCase())
-            );
-      const sortedProducts = () => {
-        const sortedArray = [...searchedProducts];
-        switch (sort) {
-          case "A-Z":
-            sortedArray.sort((a: Product, b: Product) =>
-              a.name.localeCompare(b.name)
-            );
-            break;
-          case "Z-A":
-            sortedArray.sort((a: Product, b: Product) =>
-              b.name.localeCompare(a.name)
-            );
-            break;
-          case "High-Low":
-            sortedArray.sort((a: Product, b: Product) => b.price - a.price);
-            break;
-          case "Low-High":
-            sortedArray.sort((a: Product, b: Product) => a.price - b.price);
-            break;
-          default:
-            break;
-        }
+    async function fetchData() {
+      try {
+        const [productsData, userData] = await Promise.all([
+          getProducts(),
+          checkLoggedIn(),
+        ]);
 
-        return sortedArray;
-      };
-      setProducts(sortedProducts());
+        const filteredProducts = productsData.filter(
+          (item: Product) =>
+            item.price >= priceFilter.min &&
+            item.price <= (priceFilter.max || Infinity)
+        );
+        const categorisedProducts =
+          category === "All"
+            ? filteredProducts
+            : filteredProducts.filter(
+                (item: Product) => item.category === category
+              );
+        const searchedProducts =
+          search.trim() === ""
+            ? categorisedProducts
+            : categorisedProducts.filter((item: Product) =>
+                item.name.toLowerCase().includes(search.toLowerCase())
+              );
+        const sortedProducts = () => {
+          const sortedArray = [...searchedProducts];
+          switch (sort) {
+            case "A-Z":
+              sortedArray.sort((a: Product, b: Product) =>
+                a.name.localeCompare(b.name)
+              );
+              break;
+            case "Z-A":
+              sortedArray.sort((a: Product, b: Product) =>
+                b.name.localeCompare(a.name)
+              );
+              break;
+            case "High-Low":
+              sortedArray.sort((a: Product, b: Product) => b.price - a.price);
+              break;
+            case "Low-High":
+              sortedArray.sort((a: Product, b: Product) => a.price - b.price);
+              break;
+            default:
+              break;
+          }
+
+          return sortedArray;
+        };
+        setProducts(sortedProducts());
+        setUserRole(userData.user?.role);
+      } catch (error) {
+        console.error("Error fetching products and user details", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
-    async function fetchUser() {
-      const data = await checkLoggedIn();
-      setUserRole(data.user?.role);
-    }
-
-    fetchProducts();
-    fetchUser();
+    fetchData();
   }, [priceFilter, category, search, sort]);
 
   async function deleteSpecificProduct(productId: string) {
@@ -171,6 +178,10 @@ export default function Products() {
     } catch (error) {
       console.error("Error editing product:", error);
     }
+  }
+
+  if (isLoading) {
+    return <Spinner />;
   }
 
   return (

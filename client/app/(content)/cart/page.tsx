@@ -7,6 +7,7 @@ import BackButton from "../_components/BackButton";
 import { deleteCartItem, fetchCartItems } from "../_utils/products";
 import Buy from "../_components/Buy";
 import DeleteCartItem from "../_components/DeleteCartItem";
+import Spinner from "../_components/Spinner";
 
 export default function Cart() {
   const router = useRouter();
@@ -49,11 +50,7 @@ export default function Cart() {
   }
 
   if (loading) {
-    return (
-      <div className="flex justify-center text-[32px] font-bold">
-        Loading...
-      </div>
-    );
+    return <Spinner />;
   }
   if (!cartItems.length)
     return (

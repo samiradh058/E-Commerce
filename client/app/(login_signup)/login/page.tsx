@@ -60,7 +60,7 @@ export default function LoginSignupModern() {
       const result = await loginUser(formData);
 
       if (!result.success) {
-        alert(result.error);
+        setErrors({ login: "Invalid Credentials" });
       } else {
         redirect("/");
       }
@@ -102,6 +102,10 @@ export default function LoginSignupModern() {
               )}
             </div>
           ))}
+
+          <p className="text-red-500 text-sm my-2 flex justify-center">
+            {errors["login"]}
+          </p>
           <button
             type="submit"
             className="w-full bg-primary text-white p-2 rounded-lg hover:opacity-95 hover:scale-105 transition-transform duration-200"
