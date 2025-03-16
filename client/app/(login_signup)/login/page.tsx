@@ -1,6 +1,6 @@
 "use client";
 
-import { loginUser } from "@/app/(content)/_utils/user";
+import { forgotPassword, loginUser } from "@/app/(content)/_utils/user";
 import { redirect } from "next/navigation";
 import { JSX, useState } from "react";
 import { IoIosMail, IoMdKey } from "react-icons/io";
@@ -8,6 +8,7 @@ import { IoIosMail, IoMdKey } from "react-icons/io";
 export default function LoginSignupModern() {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [successMessage, setSuccessMessage] = useState("");
 
   const loginSignup2Text = "Login";
   const loginSignup2Form = [
@@ -52,7 +53,7 @@ export default function LoginSignupModern() {
     return Object.keys(formErrors).length === 0; // Return true if no errors
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmitLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Only proceed if the form is valid
@@ -67,6 +68,16 @@ export default function LoginSignupModern() {
     }
   };
 
+  const handleSubmitForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = await forgotPassword(formData);
+    if (!result.success) {
+      setErrors({ forgotPassword: "Invalid Email" });
+      return;
+    }
+    setSuccessMessage("Password reset link has been sent to your email.");
+  };
+
   const iconMap: { [key: string]: JSX.Element } = {
     IoIosMail: <IoIosMail className="text-gray-500" />,
     IoMdKey: <IoMdKey className="text-gray-500" />,
@@ -74,12 +85,12 @@ export default function LoginSignupModern() {
 
   return (
     <div className="flex items-center justify-center w-full">
-      <div className="w-[18rem] sm:w-[20rem] lg:w-[22rem] p-6 bg-white rounded-2xl shadow-lg">
+      <div className="w-[18rem] sm:w-[20rem] lg:w-[22rem] p-6 pb-4 bg-white rounded-2xl shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-6">
           {loginSignup2Text}
         </h2>
 
-        <form onSubmit={handleSubmit}>
+        <form>
           {loginSignup2Form?.map((field, index) => (
             <div className="mb-4" key={index}>
               <label className="block text-sm font-medium text-gray-700">
@@ -103,14 +114,26 @@ export default function LoginSignupModern() {
             </div>
           ))}
 
-          <p className="text-red-500 text-sm my-2 flex justify-center">
+          <p className="text-red-500 text-sm flex justify-center">
+            {errors["forgotPassword"]}
+          </p>
+          <p className="text-red-500 text-sm flex justify-center">
             {errors["login"]}
           </p>
+          <p className="text-primary text-sm flex justify-center">
+            {successMessage}
+          </p>
           <button
-            type="submit"
+            onClick={handleSubmitLogin}
             className="w-full bg-primary text-white p-2 rounded-lg hover:opacity-95 hover:scale-105 transition-transform duration-200"
           >
             {loginSignup2Text}
+          </button>
+          <button
+            onClick={handleSubmitForgotPassword}
+            className="mt-2 w-full text-primary hover:opacity-95 hover:scale-105 transition-transform duration-200"
+          >
+            Forgot Password
           </button>
         </form>
       </div>

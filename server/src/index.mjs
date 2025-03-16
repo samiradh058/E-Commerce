@@ -6,6 +6,9 @@ import passport from "passport";
 import MongoStore from "connect-mongo";
 import routes from "./routes/index.mjs";
 import "./strategies/passport.mjs";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 const PORT = 8080;
