@@ -121,3 +121,68 @@ export const fetchUsers = async () => {
     console.error("Error occurred during fetching users", error);
   }
 };
+
+// Forgot Password
+export const forgotPassword = async (formData: { [key: string]: string }) => {
+  try {
+    const res = await fetch("http://localhost:8080/forgot-password", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    console.log("res is ", res);
+
+    if (res.status === 500) {
+      return { success: false, error: "Internal Server Error" };
+    }
+    if (res.status === 200) {
+      return { success: true };
+    }
+    return { success: false, error: "Unexpected response from the server" };
+  } catch (error) {
+    console.error("Error occurred during forgot password", error);
+    return { success: false, error: "Unexpected error occured" };
+  }
+};
+
+// Reset Password
+export const resetPassword = async (
+  token: string,
+  newPassword: string,
+  confirmPassword: string
+) => {
+  if (newPassword !== confirmPassword) {
+    return { success: false, message: "Passwords do not match." };
+  }
+
+  try {
+    const res = await fetch(`http://localhost:8080/reset-password/${token}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ newPassword }),
+    });
+
+    const data = await res.json();
+
+    if (res.status === 500) {
+      return {
+        success: false,
+        message: data.message || "Something went wrong.",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Your password has been reset successfully.",
+    };
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    return { success: false, message: "Unexpected error occurred." };
+  }
+};

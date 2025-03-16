@@ -122,6 +122,7 @@ export async function addProduct(formData: { [key: string]: string | number }) {
   }
 }
 
+// Delete product
 export async function deleteProduct(productId: string) {
   try {
     const response = await fetch(`http://localhost:8080/delete_product`, {
@@ -146,6 +147,7 @@ export async function deleteProduct(productId: string) {
   }
 }
 
+// Update product
 export async function updateProduct(
   productId: string,
   updatedProduct: {

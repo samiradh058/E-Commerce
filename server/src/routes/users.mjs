@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import { User } from "../mongoose/users.mjs";
 import passport from "passport";
 import { Admin } from "../mongoose/admins.mjs";
+import { sendEmail } from "../utils/send-mail.mjs";
+import crypto from "crypto";
 
 const router = Router();
 
@@ -43,7 +45,6 @@ router.post("/signup", async (req, res) => {
 
 // Login
 router.post("/login", (req, res, next) => {
-  console.log("Login path");
   passport.authenticate("local", async (err, user, info) => {
     if (err) return res.status(500).json({ message: "Login failed" });
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
@@ -131,6 +132,62 @@ router.get("/users", async (req, res) => {
     return res
       .status(500)
       .json({ message: "Error occured while fetching users" });
+  }
+});
+
+// Forgot Password
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const token = user.generatePasswordResetToken();
+    await user.save();
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+    const message = `Please click on this link to reset your password: ${resetUrl}`;
+
+    await sendEmail(email, "Reset Password", message);
+    return res
+      .status(200)
+      .json({ message: "Password reset link sent to your email" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error occured while sending reset password email" });
+  }
+});
+
+// Once user clicks on the link sent on email
+router.post("/reset-password/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ message: "Error resetting password" });
   }
 });
 
