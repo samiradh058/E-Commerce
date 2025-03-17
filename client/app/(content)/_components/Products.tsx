@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 
 import {
   deleteProduct,
@@ -6,10 +7,10 @@ import {
   addProduct,
   updateProduct,
 } from "../_utils/products";
-import { useEffect, useState } from "react";
 import { checkLoggedIn } from "../_utils/user";
 import EachProduct from "./EachProduct";
 import Spinner from "./Spinner";
+import { useSearchParams } from "next/navigation";
 
 interface Product {
   productId: string;
@@ -44,8 +45,10 @@ export default function Products() {
   });
   const [priceFilter, setPriceFilter] = useState({ min: 0, max: Infinity });
   const [category, setCategory] = useState("All");
-  const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
+
+  const searchParams = useSearchParams();
+  const query = searchParams.get("search") || "";
 
   useEffect(() => {
     async function fetchData() {
@@ -55,7 +58,11 @@ export default function Products() {
           checkLoggedIn(),
         ]);
 
-        const filteredProducts = productsData.filter(
+        const searchedProducts = productsData.filter((item: Product) =>
+          query ? item.name.toLowerCase().includes(query.toLowerCase()) : true
+        );
+
+        const filteredProducts = searchedProducts.filter(
           (item: Product) =>
             item.price >= priceFilter.min &&
             item.price <= (priceFilter.max || Infinity)
@@ -66,14 +73,8 @@ export default function Products() {
             : filteredProducts.filter(
                 (item: Product) => item.category === category
               );
-        const searchedProducts =
-          search.trim() === ""
-            ? categorisedProducts
-            : categorisedProducts.filter((item: Product) =>
-                item.name.toLowerCase().includes(search.toLowerCase())
-              );
         const sortedProducts = () => {
-          const sortedArray = [...searchedProducts];
+          const sortedArray = [...categorisedProducts];
           switch (sort) {
             case "A-Z":
               sortedArray.sort((a: Product, b: Product) =>
@@ -107,7 +108,7 @@ export default function Products() {
     }
 
     fetchData();
-  }, [priceFilter, category, search, sort]);
+  }, [priceFilter, category, sort, query]);
 
   async function deleteSpecificProduct(productId: string) {
     if (!confirm("Are you sure you want to delete this item?")) return;
@@ -206,7 +207,7 @@ export default function Products() {
           </button>
         </div>
       )}
-      <div className="flex justify-between mb-2">
+      <div className="flex justify-between mb-4">
         <div className="flex gap-2 items-center">
           <h2>Filter (Price):</h2>
           <input
@@ -245,15 +246,7 @@ export default function Products() {
             <option value="Woman">Woman</option>
           </select>
         </div>
-        <div className="flex gap-2 items-center">
-          <h2>Search</h2>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-64 px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all"
-          />
-        </div>
+
         <div className="flex gap-2 items-center">
           <h2>Sort</h2>
           <select

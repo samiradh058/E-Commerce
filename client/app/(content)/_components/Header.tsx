@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Search from "./Search";
 import Login_Singup from "./Login_Signup";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -47,8 +46,6 @@ export default function Header() {
           QuickCart
         </h1>
       </Link>
-
-      <Search />
 
       {loggedIn && user ? (
         <div className="flex items-center gap-2">
