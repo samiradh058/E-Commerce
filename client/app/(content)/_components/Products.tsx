@@ -124,11 +124,19 @@ export default function Products() {
   }
 
   async function handleAddProduct() {
+    if (
+      !newProduct.name.trim() ||
+      !newProduct.description.trim() ||
+      newProduct.price <= 0 ||
+      newProduct.quantity <= 0 ||
+      newProduct.category.trim() === ""
+    ) {
+      alert("Please fill in all fields correctly before adding the product.");
+      return;
+    }
+
     try {
-      const data = await addProduct({
-        ...newProduct,
-        qna: JSON.stringify(newProduct.qna),
-      });
+      const data = await addProduct(newProduct);
       if (data) {
         setProducts([...products, data.product]);
         setShowModal(false);
@@ -305,7 +313,6 @@ export default function Products() {
                   <input
                     type="number"
                     placeholder="Price"
-                    value={newProduct.price}
                     onChange={(e) =>
                       setNewProduct({
                         ...newProduct,
@@ -323,7 +330,6 @@ export default function Products() {
                   <input
                     type="number"
                     placeholder="Quantity"
-                    value={newProduct.quantity}
                     onChange={(e) =>
                       setNewProduct({
                         ...newProduct,
