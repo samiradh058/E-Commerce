@@ -101,7 +101,9 @@ export async function updateQuantity(
 }
 
 // Add product
-export async function addProduct(formData: { [key: string]: string | number }) {
+export async function addProduct(formData: {
+  [key: string]: string | number | object;
+}) {
   try {
     const response = await fetch("http://localhost:8080/add_product", {
       method: "POST",

@@ -1,7 +1,7 @@
 "use client";
 
 import { forgotPassword, loginUser } from "@/app/(content)/_utils/user";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { JSX, useState } from "react";
 import { IoIosMail, IoMdKey } from "react-icons/io";
 
@@ -9,6 +9,9 @@ export default function LoginSignupModern() {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
 
   const loginSignup2Text = "Login";
   const loginSignup2Form = [
@@ -55,27 +58,48 @@ export default function LoginSignupModern() {
 
   const handleSubmitLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
 
-    // Only proceed if the form is valid
     if (validateForm()) {
-      const result = await loginUser(formData);
+      setIsLoading(true);
+      try {
+        const result = await loginUser(formData);
 
-      if (!result.success) {
-        setErrors({ login: "Invalid Credentials" });
-      } else {
-        redirect("/");
+        console.log(result.success);
+
+        if (result.success) {
+          router.replace("/");
+        } else {
+          setErrors({ login: "Invalid Credentials" });
+        }
+      } catch (error) {
+        console.error("Login error:" + error);
+        setErrors({ login: "Something went wrong. Please try again." });
+        console.error("Login error:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   const handleSubmitForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await forgotPassword(formData);
-    if (!result.success) {
-      setErrors({ forgotPassword: "Invalid Email" });
-      return;
+    setErrors({});
+    setIsLoading(true);
+    try {
+      const result = await forgotPassword(formData);
+      if (!result.success) {
+        setErrors({ forgotPassword: "Invalid Email" });
+        return;
+      }
+      setSuccessMessage("Password reset link has been sent to your email.");
+    } catch (error) {
+      setErrors({
+        forgotPassword: "Something went wrong while sending email" + error,
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setSuccessMessage("Password reset link has been sent to your email.");
   };
 
   const iconMap: { [key: string]: JSX.Element } = {
@@ -125,13 +149,17 @@ export default function LoginSignupModern() {
           </p>
           <button
             onClick={handleSubmitLogin}
-            className="w-full bg-primary text-white p-2 rounded-lg hover:opacity-95 hover:scale-105 transition-transform duration-200"
+            className={`w-full ${
+              isLoading ? "bg-gray-500" : "bg-primary"
+            } text-white p-2 rounded-lg hover:opacity-95 hover:scale-105 transition-transform duration-200`}
           >
             {loginSignup2Text}
           </button>
           <button
             onClick={handleSubmitForgotPassword}
-            className="mt-2 w-full text-primary hover:opacity-95 hover:scale-105 transition-transform duration-200"
+            className={`mt-2 w-full ${
+              isLoading ? "text-gray-500" : "text-primary"
+            }  hover:opacity-95 hover:scale-105 transition-transform duration-200`}
           >
             Forgot Password
           </button>

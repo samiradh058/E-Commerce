@@ -61,10 +61,10 @@ export default async function ProductPage({
                       {
                         product.qna.filter(
                           (q: { question: string; answer: string }) =>
-                            q.answer.trim() !== ""
+                            q.answer?.trim() !== ""
                         ).length
                       }
-                    </span>
+                    </span>{" "}
                     Answered Questions
                   </Link>
                   <p className="text-base md:text-lg text-textSecondary">
