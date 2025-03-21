@@ -60,39 +60,3 @@ app.use(routes);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-// Creating product
-// const createProduct = async () => {
-//   const newProduct = new Product({
-//     name: "Smartphone",
-//     price: 699.99,
-//     quantity: 150,
-//     image: "https://example.com/smartphone.jpg",
-//     category: "All",
-//     description: "Cost efficient smart phone",
-//     qna: [{ question: "How is it", answer: "Good" }],
-//   });
-
-//   try {
-//     const savedProduct = await newProduct.save();
-//     console.log("Product saved:", savedProduct);
-//   } catch (err) {
-//     console.error("Error saving product:", err);
-//   }
-// };
-// createProduct();
-
-// Fetch all products
-
-/* Product.find()
-  .then((products) => {
-    console.log("All Products:", products);
-  })
-  .catch((err) => {
-    console.error("Error fetching products:", err);
-  });
-*/
-
-// app.get("/api/home", (req, res) => {
-//   res.json({ message: "Hello World" });
-// });
