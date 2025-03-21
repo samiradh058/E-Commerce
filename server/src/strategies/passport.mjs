@@ -20,7 +20,6 @@ passport.use(
         }
 
         if (!user) {
-          console.log("No user");
           return done(null, false, { message: "Invalid email or password" });
         }
 

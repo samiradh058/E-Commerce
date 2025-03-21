@@ -121,6 +121,8 @@ router.put("/cart/update", async (req, res) => {
     const { productId, action } = req.body;
     const userId = req.user._id;
 
+    console.log("cart update triggered");
+
     let cartItem = await Cart.findOne({ userId, productId });
 
     if (!cartItem) {
@@ -266,6 +268,21 @@ router.put("/update_product/:productId", async (req, res) => {
   } catch (error) {
     console.error("Error updating product:", error);
     return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Get specific cart item detail
+router.get("/cart/:userId/:productId", async (req, res) => {
+  try {
+    const { userId, productId } = req.params;
+    const cartItem = await Cart.findOne({ userId, productId });
+    if (!cartItem) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+    return res.status(200).json(cartItem);
+  } catch (error) {
+    console.error("Error fetching cart item:", error);
+    return res.status(500).json({ message: "Failed to fetch cart item" });
   }
 });
 
