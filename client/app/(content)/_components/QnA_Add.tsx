@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import AddToCart from "./AddToCart";
 import AskQuestion from "./AskQuestion";
-import Buy from "./Buy";
 import { checkLoggedIn } from "../_utils/user";
 
-export default function QnA_Buy_Add({ productId }: { productId: string }) {
+export default function QnA_Add({ productId }: { productId: string }) {
   const [role, setRole] = useState("user");
 
   useEffect(() => {
@@ -26,7 +25,6 @@ export default function QnA_Buy_Add({ productId }: { productId: string }) {
       <AskQuestion productId={productId} />
       <div className="flex gap-4 mt-4">
         <AddToCart productId={productId} />
-        <Buy productId={productId} />
       </div>
     </div>
   );
