@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { getProductFromId } from "../../_utils/products";
 import BackButton from "../../_components/BackButton";
-import QnA_Buy_Add from "../../_components/QnA_Buy_Add";
+import QnA_Add from "../../_components/QnA_Add";
 
 export default async function ProductPage({
   params,
@@ -82,7 +82,7 @@ export default async function ProductPage({
                 </div>
               </div>
               <div className="flex justify-between items-center gap-6 w-full">
-                <QnA_Buy_Add productId={product.productId} />
+                <QnA_Add productId={product.productId} />
                 <div className="flex flex-col">
                   <p className="text-lg text-textSecondary mb-2">
                     Delivery Options

@@ -1,3 +1,4 @@
+import request from "request";
 import { Router } from "express";
 import { Product } from "../mongoose/products.mjs";
 import { Cart } from "../mongoose/cartItem.mjs";
@@ -279,10 +280,80 @@ router.get("/cart/:userId/:productId", async (req, res) => {
     if (!cartItem) {
       return res.status(404).json({ message: "Cart item not found" });
     }
-    return res.status(200).json(cartItem);
+
+    const cartProduct = await Product.findOne({
+      productId: productId,
+    });
+
+    if (!cartProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const cartProductPrice = cartProduct.price;
+
+    return res.status(200).json({
+      cartItem: {
+        _id: cartItem._id,
+        quantity: cartItem.quantity,
+        productId: cartItem.productId,
+      },
+      cartProductPrice: cartProductPrice,
+    });
   } catch (error) {
     console.error("Error fetching cart item:", error);
     return res.status(500).json({ message: "Failed to fetch cart item" });
+  }
+});
+
+// Buy product (Khalti)
+router.post("/cart/buy", async (req, res) => {
+  try {
+    const { userId, productId, total, name, email, address, phone } = req.body;
+
+    const options = {
+      method: "POST",
+      url: "https://dev.khalti.com/api/v2/epayment/initiate/",
+      headers: {
+        Authorization: "Key 92bd6e846a624848a257855d970ee1f7",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        return_url: "http://localhost:3000/payment-success",
+        website_url: "http://localhost:3000/",
+        amount: total * 100,
+        purchase_order_id: `Order_${Date.now()}`,
+        purchase_order_name: productId,
+        customer_info: {
+          userId,
+          name,
+          email,
+          phone,
+          address,
+        },
+      }),
+    };
+
+    // Send request to Khalti API
+    request(options, (error, response, body) => {
+      if (error) {
+        console.error("Error initiating payment:", error);
+        return res.status(500).json({ message: "Payment initiation failed" });
+      }
+
+      const responseData = JSON.parse(body);
+
+      if (response.statusCode === 200) {
+        res.json({ success: true, payment_url: responseData.payment_url });
+      } else {
+        res.status(response.statusCode).json({
+          success: false,
+          message: responseData.detail || "Payment failed",
+        });
+      }
+    });
+  } catch (error) {
+    console.error("Error buying product:", error);
+    res.status(500).json({ message: "Failed to buy product" });
   }
 });
 

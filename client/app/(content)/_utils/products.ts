@@ -17,7 +17,6 @@ export async function getProducts() {
 // Fetch product based on Id
 export async function getProductFromId(productId: string) {
   try {
-    console.log("product id from utils is ", productId);
     const res = await fetch(`http://localhost:8080/products/${productId}`, {
       cache: "no-store",
     });
@@ -88,12 +87,14 @@ export async function updateQuantity(
       body: JSON.stringify({ productId, action }),
     });
 
+    const data = await res.json();
+
     if (res.ok) {
-      const { updatedQuantity } = await res.json();
+      const { updatedQuantity } = await data;
 
       return updatedQuantity;
     } else {
-      console.error("Error updating quantity");
+      alert("Failed to update quantity! " + data.message);
     }
   } catch (error) {
     console.error("Error updating quantity", error);
@@ -179,5 +180,68 @@ export async function updateProduct(
   } catch (error) {
     console.error("Error updating product:", error);
     return { success: false, error: "Error updating product" };
+  }
+}
+
+// Get the details of specific item in cart based on product id and user id
+export async function getCartItemDetails(productId: string, userId: string) {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/cart/${userId}/${productId}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+    if (response.status !== 200) {
+      const errorData = await response.json();
+      return { success: false, error: errorData.message || "Unauthorized" };
+    }
+    const data = await response.json();
+
+    const cartItem = data.cartItem;
+    const cartProductPrice = data.cartProductPrice;
+
+    if (!cartItem || cartProductPrice === undefined) {
+      return { success: false, error: "Missing cart item or product price" };
+    }
+
+    return { success: true, data: { cartItem, cartProductPrice } };
+  } catch (error) {
+    console.error("Error fetching cart item details", error);
+    return { success: false, error: "Error fetching cart item details" };
+  }
+}
+
+// Buy product (Khalti Payment Gateway)
+export async function buyProduct(productData: {
+  userId: string;
+  productId: string;
+  total: number;
+  name: string;
+  email: string;
+  address: string;
+  phone: string;
+}) {
+  try {
+    const response = await fetch("http://localhost:8080/cart/buy", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productData),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      window.location.href = data.payment_url;
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (error) {
+    console.error("Error buying product", error);
+    return { success: false, error: "Error buying product" };
   }
 }

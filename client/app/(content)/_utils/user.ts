@@ -35,7 +35,6 @@ export const signupUser = async (formData: { [key: string]: string }) => {
 
 export const loginUser = async (formData: { [key: string]: string }) => {
   try {
-    console.log("Login user triggered");
     const response = await fetch("http://localhost:8080/login", {
       method: "POST",
       headers: {
@@ -45,7 +44,6 @@ export const loginUser = async (formData: { [key: string]: string }) => {
       credentials: "include",
     });
     const data = await response.json();
-    console.log("data after login", data);
     if (!response.ok) {
       return { success: false, error: data.message || "Login failed" };
     }
