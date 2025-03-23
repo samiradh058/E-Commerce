@@ -245,3 +245,32 @@ export async function buyProduct(productData: {
     return { success: false, error: "Error buying product" };
   }
 }
+
+// Verify payment
+export async function verifyPayment(
+  searchParams: URLSearchParams
+): Promise<void> {
+  try {
+    const response = await fetch("http://localhost:8080/cart/verify-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(Object.fromEntries(searchParams.entries())),
+      credentials: "include",
+    });
+
+    const data: {
+      success: boolean;
+      message: string;
+    } = await response.json();
+    if (data.success) {
+      alert(data.message + " Your order is confirmed.");
+      window.location.href = "/";
+    } else {
+      alert("Payment verification failed: " + data.message);
+      window.location.href = "/cart";
+    }
+  } catch (error) {
+    alert("An error occurred while verifying payment." + error);
+    window.location.href = "/cart";
+  }
+}

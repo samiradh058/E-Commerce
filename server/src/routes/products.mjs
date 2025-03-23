@@ -314,7 +314,7 @@ router.post("/cart/buy", async (req, res) => {
       method: "POST",
       url: "https://dev.khalti.com/api/v2/epayment/initiate/",
       headers: {
-        Authorization: "Key 92bd6e846a624848a257855d970ee1f7",
+        Authorization: `Key ${process.env.LIVE_SECRET_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -354,6 +354,54 @@ router.post("/cart/buy", async (req, res) => {
   } catch (error) {
     console.error("Error buying product:", error);
     res.status(500).json({ message: "Failed to buy product" });
+  }
+});
+
+// Verify payment
+router.post("/cart/verify-payment", async (req, res) => {
+  try {
+    const { pidx } = req.body;
+
+    if (!pidx) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid payment details." });
+    }
+
+    const response = await fetch(
+      "https://dev.khalti.com/api/v2/epayment/lookup/",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Key ${process.env.LIVE_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pidx }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok && data.status === "Completed") {
+      // You can store the transaction details in your database here
+
+      return res.json({
+        success: true,
+        message: "Payment verified successfully!",
+        data,
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Payment verification failed.",
+        data,
+      });
+    }
+  } catch (error) {
+    console.error("Error verifying payment:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error." });
   }
 });
 
