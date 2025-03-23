@@ -42,6 +42,7 @@ export default function Buy({ productId }: { productId: string }) {
         address,
         phone,
       });
+      setAddress("");
     } catch (error) {
       setError("Something went wrong. Please try again." + error);
     } finally {
@@ -79,7 +80,7 @@ export default function Buy({ productId }: { productId: string }) {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <h2 className="text-xl font-semibold mb-4 text-center">
-              Complete Your Purchase
+              Your Purchase
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <label className="block">
@@ -121,32 +122,38 @@ export default function Buy({ productId }: { productId: string }) {
                   type="text"
                   name="phone"
                   value={phone}
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border rounded-md text-gray-500"
                   disabled
                 />
               </label>
-              <label className="block">
-                Quantity
-                <input
-                  type="number"
-                  name="quantity"
-                  min="1"
-                  value={quantity}
-                  className="w-full p-2 border rounded-md"
-                  disabled
-                />
-              </label>
-              <label className="block">
-                Total
-                <input
-                  type="number"
-                  name="total"
-                  min="1"
-                  value={total}
-                  className="w-full p-2 border rounded-md"
-                  disabled
-                />
-              </label>
+              <div className="flex justify-between">
+                <label className="w-[45%]">
+                  Quantity
+                  <input
+                    type="number"
+                    name="quantity"
+                    min="1"
+                    value={quantity}
+                    className="w-full p-2 border rounded-md text-gray-500"
+                    disabled
+                  />
+                </label>
+                <label className="w-[45%]">
+                  Total
+                  <div className="flex items-center border rounded-md p-2">
+                    <span className="pr-2 text-gray-500">Rs</span>
+                    <input
+                      type="number"
+                      name="total"
+                      min="1"
+                      value={total}
+                      className="w-full text-gray-500 focus:outline-none"
+                      disabled
+                    />
+                  </div>
+                </label>
+              </div>
+
               {error && (
                 <p className="text-red-500 text-sm mb-2 text-center">{error}</p>
               )}
