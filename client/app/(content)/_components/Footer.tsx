@@ -94,10 +94,10 @@ export default function Footer() {
         </p>
 
         <Link
-          href="/cart"
+          href="/cart-order"
           className="bg-success text-white px-5 py-2 rounded-lg border border-green-600 shadow-md hover:opacity-90 transition-all duration-200"
         >
-          Go to Cart
+          Cart / Order
         </Link>
       </div>
     )
