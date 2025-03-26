@@ -72,7 +72,7 @@ export default function AddToCart({ productId }: { productId: string }) {
         throw new Error("Failed to add product to cart");
       }
       alert("Product added to cart!");
-      router.push("/cart");
+      router.push("/cart-order");
     } catch (error) {
       console.error("Error adding to cart:", error);
     }

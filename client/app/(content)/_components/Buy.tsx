@@ -160,7 +160,9 @@ export default function Buy({ productId }: { productId: string }) {
 
               <button
                 type="submit"
-                className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+                className={`w-full ${
+                  loading ? "bg-gray-500 hover:bg-gray-600" : "bg-blue-500"
+                }  text-white py-2 rounded-md hover:bg-blue-600`}
                 disabled={loading}
               >
                 {loading ? "Processing..." : "Confirm Purchase"}

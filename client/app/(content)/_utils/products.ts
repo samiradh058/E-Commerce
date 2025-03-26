@@ -44,7 +44,7 @@ export async function fetchCartItems() {
 
     const data = await response.json();
 
-    if (data.message === "Admin donot have a cart") {
+    if (!response.ok) {
       return data.message;
     }
 
@@ -210,6 +210,59 @@ export async function getCartItemDetails(productId: string, userId: string) {
   } catch (error) {
     console.error("Error fetching cart item details", error);
     return { success: false, error: "Error fetching cart item details" };
+  }
+}
+
+// Fetch order items
+export async function fetchOrderItems() {
+  try {
+    const response = await fetch("http://localhost:8080/orders", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (response.status === 401) {
+      return { error: "unauthorized" };
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { message: data.message };
+    }
+
+    return { data };
+  } catch (error) {
+    console.error("Error fetching order items", error);
+    return { error: "fetch_failed" };
+  }
+}
+
+// Change received status in order
+export async function changeReceivedStatus({
+  transactionId,
+  receivedStatus,
+}: {
+  transactionId: string;
+  receivedStatus: boolean;
+}) {
+  try {
+    const response = await fetch("http://localhost:8080/update-order-status", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ transactionId, receivedStatus }),
+      credentials: "include",
+    });
+
+    console.log("response is ", response);
+    if (!response.ok) {
+      throw new Error("Failed to change received status");
+    }
+  } catch (error) {
+    console.error("Error changing received status", error);
+    return { error: "Failed to change received status" };
   }
 }
 

@@ -2,6 +2,7 @@ import request from "request";
 import { Router } from "express";
 import { Product } from "../mongoose/products.mjs";
 import { Cart } from "../mongoose/cartItem.mjs";
+import { Order } from "../mongoose/orderItem.mjs";
 
 const router = Router();
 // Fetch all products
@@ -58,16 +59,14 @@ router.post("/product/qna", async (req, res) => {
 // Fetch cart items
 router.get("/cart", async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized, Login first!" });
-    }
-    if (req.user.role === "admin") {
-      return res.status(200).json({ message: "Admin donot have a cart" });
+    if (!req.user || req.user.role === "admin") {
+      return res.status(401).json({ message: "unauthorized" });
     }
     const cart = await Cart.find({ userId: req.user._id });
     if (!cart.length) {
       return res.status(404).json({ message: "Product not found" });
     }
+
     const cartItems = await Promise.all(
       cart.map(async (item) => {
         const product = await Product.findOne({ productId: item.productId });
@@ -121,8 +120,6 @@ router.put("/cart/update", async (req, res) => {
     }
     const { productId, action } = req.body;
     const userId = req.user._id;
-
-    console.log("cart update triggered");
 
     let cartItem = await Cart.findOne({ userId, productId });
 
@@ -305,6 +302,67 @@ router.get("/cart/:userId/:productId", async (req, res) => {
   }
 });
 
+// Get order items
+router.get("/orders", async (req, res) => {
+  if (!req.user || req.user.role === "admin") {
+    return res.status(401).json({ message: "unauthorized" });
+  }
+
+  try {
+    const orders = await Order.find({ userId: req.user._id });
+    if (!orders.length) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const ordersWithProductNames = await Promise.all(
+      orders.map(async (order) => {
+        const product = await Product.findOne({ productId: order.productId });
+        return {
+          ...order.toObject(),
+          productName: product ? product.name : "Product not found",
+        };
+      })
+    );
+
+    return res.status(200).json(ordersWithProductNames);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return res.status(500).json({ message: "Failed to fetch orders" });
+  }
+});
+
+// Change received status of order
+router.patch("/update-order-status", async (req, res) => {
+  const transaction_id = req.body.transactionId;
+  const status = req.body.receivedStatus;
+  const userId = req.user._id;
+
+  if (!transaction_id || !userId || status === undefined) {
+    return res.status(400).json({ message: "Invalid request" });
+  }
+
+  try {
+    const order = await Order.findOne({
+      userId: userId,
+      transactionId: transaction_id,
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.receivedStatus = !status;
+    await order.save();
+
+    return res
+      .status(200)
+      .json({ message: "Order status updated successfully" });
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    return res.status(500).json({ message: "Failed to update order status" });
+  }
+});
+
 // Buy product (Khalti)
 router.post("/cart/buy", async (req, res) => {
   try {
@@ -360,7 +418,7 @@ router.post("/cart/buy", async (req, res) => {
 // Verify payment
 router.post("/cart/verify-payment", async (req, res) => {
   try {
-    const { pidx } = req.body;
+    const { pidx, purchase_order_name } = req.body;
 
     if (!pidx) {
       return res
@@ -383,7 +441,62 @@ router.post("/cart/verify-payment", async (req, res) => {
     const data = await response.json();
 
     if (response.ok && data.status === "Completed") {
-      // You can store the transaction details in your database here
+      const { transaction_id, total_amount, status } = data;
+
+      if (!req.user._id || !transaction_id || !total_amount || !status) {
+        return res.status(400).json({
+          success: false,
+          message: "Payment verification failed.",
+          data,
+        });
+      }
+
+      const existingOrder = await Order.findOne({
+        transactionId: transaction_id,
+      });
+
+      if (existingOrder) {
+        return res.status(400).json({
+          success: false,
+          message: "Order with this transaction ID already exists.",
+          order: existingOrder,
+        });
+      }
+
+      const cartItem = await Cart.findOne({
+        userId: req.user._id,
+        productId: purchase_order_name,
+      });
+
+      if (!cartItem) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found in cart" });
+      }
+
+      const { quantity } = cartItem;
+
+      let order = new Order({
+        userId: req.user._id,
+        productId: purchase_order_name,
+        transactionId: transaction_id,
+        totalAmount: total_amount,
+        paymentStatus: status.toLowerCase(),
+        quantity,
+      });
+
+      await order.save();
+
+      const deleteCartItem = await Cart.findOneAndDelete({
+        userId: req.user._id,
+        productId: purchase_order_name,
+      });
+
+      if (!deleteCartItem) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found in cart" });
+      }
 
       return res.json({
         success: true,
