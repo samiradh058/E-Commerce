@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { fetchCartItems } from "../_utils/products";
 import { useEffect, useState } from "react";
 import { fetchUsers } from "../_utils/user";
+import { useAuth } from "@/app/_customHooks/useAuth";
 
 export const revalidate = 0;
 
@@ -27,7 +28,8 @@ export default function Footer() {
   useEffect(() => {
     async function loadCart() {
       const result = await fetchCartItems();
-      if (result === "Admin donot have a cart") {
+
+      if (result.error) {
         setAdmin(true);
       }
       setCartItems(result.data || []);
@@ -46,13 +48,19 @@ export default function Footer() {
     loadCart();
   }, [pathname]);
 
+  const { user } = useAuth();
+
   const totalPrice = cartItems.length
     ? cartItems.reduce((acc, item) => acc + item.price * item.quantity + 50, 0)
     : 0;
 
+  if (!user) {
+    return;
+  }
+
   if (admin)
     return (
-      pathname !== "/users" && (
+      pathname !== "/users-notdelivered" && (
         <div
           className={`bg-background shadow-md rounded-lg h-fit flex w-[98%] mx-auto p-4 items-center text-textPrimary text-lg justify-between`}
         >
@@ -64,10 +72,10 @@ export default function Footer() {
           </p>
 
           <Link
-            href="/users"
+            href="/users-notdelivered"
             className="bg-success text-white px-5 py-2 rounded-lg border border-green-600 shadow-md hover:opacity-90 transition-all duration-200"
           >
-            See all Users
+            Users / Not Delivered Items
           </Link>
         </div>
       )

@@ -3,33 +3,12 @@
 import Image from "next/image";
 import Login_Singup from "./Login_Signup";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { checkLoggedIn } from "../_utils/user";
 import UserLogout from "./UserLogout";
 import Add_Admin from "./Add_admin";
+import { useAuth } from "@/app/_customHooks/useAuth";
 
 export default function Header() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [user, setUser] = useState<{
-    name: string;
-    email: string;
-    role: string;
-  } | null>(null);
-
-  useEffect(() => {
-    async function checkLogin() {
-      const data = await checkLoggedIn();
-      if (data && data.isAuthenticated) {
-        setLoggedIn(true);
-        setUser({
-          name: data.user.name,
-          email: data.user.email,
-          role: data.user.role,
-        });
-      }
-    }
-    checkLogin();
-  }, []);
+  const { user, loggedIn } = useAuth();
 
   return (
     <div className="bg-background shadow-md h-fit flex w-[98%] mx-auto justify-between items-center p-3 rounded-lg">
@@ -49,8 +28,8 @@ export default function Header() {
 
       {loggedIn && user ? (
         <div className="flex items-center gap-2">
-          <UserLogout user={user} />{" "}
-          {user?.role === "admin" ? <Add_Admin /> : ""}{" "}
+          <UserLogout user={user} />
+          {user?.role === "admin" ? <Add_Admin /> : ""}
         </div>
       ) : (
         <Login_Singup />

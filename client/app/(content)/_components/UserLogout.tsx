@@ -15,6 +15,7 @@ export default function UserLogout({
   );
 
   const handleLogoutClick = async (): Promise<void> => {
+    confirm("Are you sure you want to logout?");
     const result = await handleLogout();
 
     if (result.success) {

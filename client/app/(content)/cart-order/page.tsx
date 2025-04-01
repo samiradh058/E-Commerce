@@ -46,7 +46,6 @@ export default function Cart() {
           cartResult.error === "unauthorized" ||
           orderResult.error === "unauthorized"
         ) {
-          router.replace("/login");
           return;
         } else if (cartResult.error || orderResult.error) {
           alert("Failed to fetch cart or order items");
@@ -76,8 +75,8 @@ export default function Cart() {
       <div>
         <BackButton />
       </div>
-      <CartTableUI cartItems={cartItems} setCartItems={setCartItems} />;
-      <OrderTableUI orderItems={orderItems} />;
+      <CartTableUI cartItems={cartItems} setCartItems={setCartItems} />
+      <OrderTableUI orderItems={orderItems} />
     </div>
   );
 }

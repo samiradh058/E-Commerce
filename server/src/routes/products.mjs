@@ -3,6 +3,8 @@ import { Router } from "express";
 import { Product } from "../mongoose/products.mjs";
 import { Cart } from "../mongoose/cartItem.mjs";
 import { Order } from "../mongoose/orderItem.mjs";
+import { User } from "../mongoose/users.mjs";
+import mongoose from "mongoose";
 
 const router = Router();
 // Fetch all products
@@ -302,7 +304,7 @@ router.get("/cart/:userId/:productId", async (req, res) => {
   }
 });
 
-// Get order items
+// Get order items specific to user Id
 router.get("/orders", async (req, res) => {
   if (!req.user || req.user.role === "admin") {
     return res.status(401).json({ message: "unauthorized" });
@@ -328,6 +330,49 @@ router.get("/orders", async (req, res) => {
   } catch (error) {
     console.error("Error fetching orders:", error);
     return res.status(500).json({ message: "Failed to fetch orders" });
+  }
+});
+
+// Get all ordered items
+router.get("/allOrders", async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(401).json({ message: "unauthorized" });
+  }
+
+  try {
+    const orders = await Order.find().select(
+      "productId userId updatedAt createdAt receivedStatus"
+    );
+
+    console.log("orders unformatted is ", orders);
+
+    const formattedOrders = await Promise.all(
+      orders.map(async (order) => {
+        const user = await User.findOne({
+          _id: new mongoose.Types.ObjectId(order.userId),
+        }).select("name email");
+        const product = await Product.findOne({
+          productId: order.productId,
+        }).select("name");
+
+        return {
+          productName: product?.name || "Unknown Product",
+          userName: user?.name || "Unknown User",
+          userEmail: user?.email || "No Email",
+          orderDate: order.createdAt,
+          updatedDate: order.updatedAt,
+          receivedStatus: order.receivedStatus || false,
+        };
+      })
+    );
+    if (!formattedOrders.length) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    return res.status(200).json(formattedOrders);
+  } catch (error) {
+    console.error("Error fetching all orders:", error);
+    return res.status(500).json({ message: "Failed to fetch all orders" });
   }
 });
 
@@ -415,7 +460,7 @@ router.post("/cart/buy", async (req, res) => {
   }
 });
 
-// Verify payment
+// Verify payment and add data in Order table
 router.post("/cart/verify-payment", async (req, res) => {
   try {
     const { pidx, purchase_order_name } = req.body;
