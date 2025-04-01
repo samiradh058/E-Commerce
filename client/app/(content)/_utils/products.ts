@@ -213,7 +213,7 @@ export async function getCartItemDetails(productId: string, userId: string) {
   }
 }
 
-// Fetch order items
+// Fetch order items for the user
 export async function fetchOrderItems() {
   try {
     const response = await fetch("http://localhost:8080/orders", {
@@ -234,6 +234,32 @@ export async function fetchOrderItems() {
     return { data };
   } catch (error) {
     console.error("Error fetching order items", error);
+    return { error: "fetch_failed" };
+  }
+}
+
+// Fetch all ordered items
+export async function fetchAllOrderItems() {
+  try {
+    const response = await fetch("http://localhost:8080/allOrders", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    console.log("response is ", response);
+
+    if (response.status === 401) {
+      return { error: "Error fetching ordered items" };
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { message: data.message };
+    }
+    return { data };
+  } catch (error) {
+    console.error("Error fetching all ordered items", error);
     return { error: "fetch_failed" };
   }
 }
@@ -315,15 +341,15 @@ export async function verifyPayment(
       success: boolean;
       message: string;
     } = await response.json();
+
     if (data.success) {
       alert(data.message + " Your order is confirmed.");
-      window.location.href = "/";
     } else {
       alert("Payment verification failed: " + data.message);
-      window.location.href = "/cart";
     }
   } catch (error) {
     alert("An error occurred while verifying payment." + error);
-    window.location.href = "/cart";
+  } finally {
+    window.location.href = "/cart-order";
   }
 }

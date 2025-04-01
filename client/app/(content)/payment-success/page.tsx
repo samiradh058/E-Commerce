@@ -12,7 +12,7 @@ const PaymentSuccess = () => {
 
     if (!pidx) {
       alert("Payment verification failed: Payment ID not found.");
-      window.location.href = "/cart";
+      window.location.href = "/cart-order";
     }
 
     verifyPayment(searchParams);

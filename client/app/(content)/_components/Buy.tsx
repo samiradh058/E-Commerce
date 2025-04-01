@@ -70,7 +70,7 @@ export default function Buy({ productId }: { productId: string }) {
     <>
       <button
         key={productId}
-        className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
+        className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
         onClick={handleOpen}
       >
         Buy
@@ -83,7 +83,7 @@ export default function Buy({ productId }: { productId: string }) {
               Your Purchase
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <label className="block">
+              <label className="flex flex-col items-start">
                 Full Name
                 <input
                   type="text"
@@ -94,7 +94,7 @@ export default function Buy({ productId }: { productId: string }) {
                   required
                 />
               </label>
-              <label className="block">
+              <label className="flex flex-col items-start">
                 Email
                 <input
                   type="email"
@@ -105,7 +105,7 @@ export default function Buy({ productId }: { productId: string }) {
                   required
                 />
               </label>
-              <label className="block">
+              <label className="flex flex-col items-start">
                 Shipping Address
                 <input
                   type="text"
@@ -116,7 +116,7 @@ export default function Buy({ productId }: { productId: string }) {
                   required
                 />
               </label>
-              <label className="block">
+              <label className="flex flex-col items-start">
                 Phone Number
                 <input
                   type="text"
@@ -127,7 +127,7 @@ export default function Buy({ productId }: { productId: string }) {
                 />
               </label>
               <div className="flex justify-between">
-                <label className="w-[45%]">
+                <label className="w-[45%] flex flex-col items-start">
                   Quantity
                   <input
                     type="number"
@@ -138,7 +138,7 @@ export default function Buy({ productId }: { productId: string }) {
                     disabled
                   />
                 </label>
-                <label className="w-[45%]">
+                <label className="w-[45%] flex flex-col items-start">
                   Total
                   <div className="flex items-center border rounded-md p-2">
                     <span className="pr-2 text-gray-500">Rs</span>

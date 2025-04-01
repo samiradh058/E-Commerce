@@ -5,6 +5,7 @@ import DeleteCartItem from "./DeleteCartItem";
 import Quantity from "./Quantity";
 import { deleteCartItem } from "../_utils/products";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/_customHooks/useAuth";
 
 interface CartItem {
   productId: string;
@@ -40,12 +41,13 @@ export default function CartTableUI({
     }
   }
 
-  if (!cartItems.length)
-    return (
-      <p className="flex justify-center text-2xl font-bold text-gray-700 mt-10">
-        Your cart is empty.
-      </p>
-    );
+  const { user } = useAuth();
+
+  if (user?.role === "admin") {
+    return;
+  }
+
+  if (!cartItems.length) return;
 
   return (
     <div className="p-6">
@@ -66,6 +68,8 @@ export default function CartTableUI({
                 <th className="p-3 border border-gray-300">Quantity</th>
                 <th className="p-3 border border-gray-300">Delete</th>
                 <th className="p-3 border border-gray-300">Buy</th>
+                <th className="p-3 border border-gray-300">Rate</th>
+                <th className="p-3 border border-gray-300">Review</th>
               </tr>
             </thead>
             <tbody>
@@ -102,6 +106,16 @@ export default function CartTableUI({
                   </td>
                   <td className="p-3 border border-gray-300 justify-center">
                     <Buy productId={item.productId} />
+                  </td>
+                  <td className="p-3 border border-gray-300 justify-center">
+                    <button className="bg-blue-300 px-4 py-2 rounded-xl">
+                      Rate
+                    </button>
+                  </td>
+                  <td className="p-3 border border-gray-300 justify-center">
+                    <button className="bg-blue-300  px-4 py-2 rounded-xl">
+                      Review
+                    </button>
                   </td>
                 </tr>
               ))}
