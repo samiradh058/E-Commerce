@@ -8,13 +8,6 @@ const PaymentSuccess = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const pidx = searchParams.get("pidx");
-
-    if (!pidx) {
-      alert("Payment verification failed: Payment ID not found.");
-      window.location.href = "/cart-order";
-    }
-
     verifyPayment(searchParams);
   }, [searchParams]);
 

@@ -102,6 +102,10 @@ router.post("/cart", async (req, res) => {
     return res.status(404).json({ message: "Product not found" });
   }
 
+  if (product.quantity <= 0) {
+    return res.status(404).json({ message: "Product not available" });
+  }
+
   try {
     const cartItem = new Cart({ userId, productId });
     product.quantity -= 1;
@@ -151,6 +155,9 @@ router.put("/cart/update", async (req, res) => {
     await cartItem.save();
     await product.save();
 
+    console.log("cart quantity", cartItem.quantity);
+    console.log("product quantity", product.quantity);
+
     return res.status(201).json({
       message: "Quantity updated successfully",
       updatedQuantity: cartItem.quantity,
@@ -197,10 +204,10 @@ router.post("/add_product", async (req, res) => {
     if (!req.user || req.user.role !== "admin") {
       return res.status(401).json({ message: "Only admin can add product" });
     }
-    const { name, price, quantity, category, description, image, qna } =
+    const { name, price, quantity, category, description, image, qna, brand } =
       req.body;
 
-    if (!name || !price || !quantity || !category || !description) {
+    if (!name || !price || !quantity || !category || !description || !brand) {
       return res.status(400).json({ message: "Please fill all fields" });
     }
     let product = new Product({
@@ -214,8 +221,10 @@ router.post("/add_product", async (req, res) => {
       description,
       image: image || "",
       qna: qna || [],
+      brand,
     });
     const savedProduct = await product.save();
+    console.log("saved product is ", savedProduct);
     return res
       .status(200)
       .json({ message: "Product added successfully", product: savedProduct });
@@ -246,21 +255,83 @@ router.delete("/delete_product", async (req, res) => {
 // Update product
 router.put("/update_product/:productId", async (req, res) => {
   try {
-    if (!req.user || req.user.role !== "admin") {
-      return res.status(401).json({ message: "Only admin can update product" });
-    }
     const { productId } = req.params;
-    const { name, price, quantity, category, description, image, qna } =
-      req.body;
+    const {
+      name,
+      price,
+      quantity,
+      category,
+      description,
+      image,
+      qna,
+      rating,
+      review,
+    } = req.body;
+
+    console.log("review is ", review);
+
+    const existingProduct = await Product.findOne({ productId });
+    if (!existingProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (
+      (name || price || quantity || category || description || image || qna) &&
+      (!req.user || req.user.role !== "admin")
+    ) {
+      return res
+        .status(401)
+        .json({ message: "Only admin can update product details" });
+    }
+
+    const updateData = {};
+
+    if (req.user?.role === "admin") {
+      if (name) updateData.name = name;
+      if (price) updateData.price = price;
+      if (quantity) updateData.quantity = quantity;
+      if (category) updateData.category = category;
+      if (description) updateData.description = description;
+      if (image) updateData.image = image;
+      if (qna) updateData.qna = qna;
+    }
+
+    if (rating !== undefined) {
+      const currentRating = existingProduct.rating;
+
+      let newRating;
+      if (!currentRating) {
+        newRating = rating;
+      } else {
+        newRating = ((currentRating + rating) / 2).toFixed(1);
+      }
+
+      updateData.rating = Number(newRating);
+    }
+
+    if (review && Array.isArray(review)) {
+      const author = review[0].author;
+
+      const alreadyReviewed = existingProduct.review?.some(
+        (r) => r.author === author
+      );
+
+      if (alreadyReviewed) {
+        return res
+          .status(400)
+          .json({ message: "You have already reviewed this product." });
+      }
+
+      const existingReviews = existingProduct.review || [];
+      updateData.review = [...existingReviews, ...review];
+    }
 
     const updatedProduct = await Product.findOneAndUpdate(
       { productId },
-      { $set: { name, price, quantity, category, description, image, qna } },
-      { new: true }
+      { $set: updateData }, // Only update specified fields
+      { new: true } // Return the updated document
     );
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+
     return res.status(200).json({
       message: "Product updated successfully",
       product: updatedProduct,

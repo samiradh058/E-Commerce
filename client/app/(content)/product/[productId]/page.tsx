@@ -1,10 +1,11 @@
-import QnA from "@/app/(content)/_components/QnA";
 import Image from "next/image";
 import Link from "next/link";
-import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { getProductFromId } from "../../_utils/products";
+
 import BackButton from "../../_components/BackButton";
 import QnA_Add from "../../_components/QnA_Add";
+import QnAReview from "../../_components/QnAReview";
 
 export default async function ProductPage({
   params,
@@ -18,6 +19,7 @@ export default async function ProductPage({
 
   const fullStars = Math.floor(product.rating);
   const hasHalfStar = product.rating % 1 !== 0;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
   return (
     <div className="bg-background min-h-screen p-6">
@@ -45,13 +47,16 @@ export default async function ProductPage({
                     {product.description}
                   </div>
                   <div className="flex gap-2 items-center font-semibold text-xl text-textPrimary">
-                    <span>{product.rating}</span>
                     {Array.from({ length: fullStars }).map((_, index) => (
                       <FaStar key={index} className="text-yellow-400" />
                     ))}
                     {hasHalfStar && (
                       <FaStarHalfAlt className="text-yellow-400" />
                     )}
+
+                    {Array.from({ length: emptyStars }).map((_, index) => (
+                      <FaRegStar key={index} className="text-gray-400" />
+                    ))}
                   </div>
                 </div>
 
@@ -59,13 +64,17 @@ export default async function ProductPage({
                   <Link href="#qna" className="text-info hover:underline">
                     <span className="font-semibold text-xl">
                       {
-                        product.qna.filter(
+                        product.qna?.filter(
                           (q: { question: string; answer: string }) =>
                             q.answer?.trim() !== ""
                         ).length
                       }
                     </span>{" "}
-                    Answered Questions
+                    Answered Questions /{" "}
+                    <span className="font-semibold text-xl">
+                      {product.review?.length}{" "}
+                    </span>
+                    Reviews
                   </Link>
                   <p className="text-base md:text-lg text-textSecondary">
                     Brand:{" "}
@@ -106,7 +115,7 @@ export default async function ProductPage({
         id="qna"
         className="h-fit mt-4 flex items-center w-full md:w-[80%] mx-auto"
       >
-        <QnA qna={product.qna} />
+        <QnAReview qna={product.qna} review={product.review} />
       </div>
     </div>
   );
