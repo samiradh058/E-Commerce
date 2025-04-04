@@ -21,6 +21,9 @@ interface Product {
   category: string;
   quantity: number;
   qna: { question: string; answer: string }[];
+  brand: string;
+  review: { author: string; comments: string }[];
+  rating: number;
   onDelete: (productId: string) => void;
   onEdit: (product: Product) => void;
   isAdmin: boolean;
@@ -42,6 +45,9 @@ export default function Products() {
     category: "All",
     quantity: 0,
     qna: [],
+    brand: "",
+    rating: 0,
+    review: [],
   });
   const [priceFilter, setPriceFilter] = useState({ min: 0, max: Infinity });
   const [category, setCategory] = useState("All");
@@ -148,6 +154,9 @@ export default function Products() {
           category: "All",
           quantity: 0,
           qna: [],
+          brand: "",
+          rating: 0,
+          review: [],
         });
       }
     } catch (error) {
@@ -165,6 +174,9 @@ export default function Products() {
       category: product.category,
       quantity: product.quantity,
       qna: product.qna,
+      brand: product.brand,
+      rating: product.rating,
+      review: product.review,
     });
     setShowModal(true);
   }
@@ -192,6 +204,9 @@ export default function Products() {
           category: "All",
           quantity: 0,
           qna: [],
+          brand: "",
+          rating: 0,
+          review: [],
         });
       }
     } catch (error) {
@@ -274,8 +289,11 @@ export default function Products() {
         </div>
       </div>
       <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {products?.length > 0 &&
-          products.map((product: Product) => (
+        {products
+          ?.filter(
+            (product: Product) => userRole === "admin" || product.quantity > 0
+          )
+          .map((product: Product) => (
             <EachProduct
               key={product.productId}
               {...product}
@@ -313,6 +331,7 @@ export default function Products() {
                   <input
                     type="number"
                     placeholder="Price"
+                    value={newProduct.price > 0 ? newProduct.price : ""}
                     onChange={(e) =>
                       setNewProduct({
                         ...newProduct,
@@ -330,10 +349,28 @@ export default function Products() {
                   <input
                     type="number"
                     placeholder="Quantity"
+                    value={newProduct.quantity > 0 ? newProduct.quantity : ""}
                     onChange={(e) =>
                       setNewProduct({
                         ...newProduct,
                         quantity: Number(e.target.value),
+                      })
+                    }
+                    className="w-full p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label htmlFor="brand" className="text-gray-700">
+                    Brand:
+                  </label>
+                  <input
+                    type="string"
+                    placeholder="Brand"
+                    value={newProduct.brand}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        brand: e.target.value,
                       })
                     }
                     className="w-full p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all"
@@ -420,6 +457,9 @@ export default function Products() {
                     category: "All",
                     quantity: 0,
                     qna: [],
+                    brand: "",
+                    review: [],
+                    rating: 0,
                   })
                 )}
                 className="px-4 py-2 bg-gray-300 rounded-md"

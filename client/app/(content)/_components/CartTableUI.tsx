@@ -68,8 +68,6 @@ export default function CartTableUI({
                 <th className="p-3 border border-gray-300">Quantity</th>
                 <th className="p-3 border border-gray-300">Delete</th>
                 <th className="p-3 border border-gray-300">Buy</th>
-                <th className="p-3 border border-gray-300">Rate</th>
-                <th className="p-3 border border-gray-300">Review</th>
               </tr>
             </thead>
             <tbody>
@@ -106,16 +104,6 @@ export default function CartTableUI({
                   </td>
                   <td className="p-3 border border-gray-300 justify-center">
                     <Buy productId={item.productId} />
-                  </td>
-                  <td className="p-3 border border-gray-300 justify-center">
-                    <button className="bg-blue-300 px-4 py-2 rounded-xl">
-                      Rate
-                    </button>
-                  </td>
-                  <td className="p-3 border border-gray-300 justify-center">
-                    <button className="bg-blue-300  px-4 py-2 rounded-xl">
-                      Review
-                    </button>
                   </td>
                 </tr>
               ))}

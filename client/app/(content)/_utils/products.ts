@@ -115,6 +115,7 @@ export async function addProduct(formData: {
       credentials: "include",
     });
     const data = await response.json();
+
     if (!response.ok) {
       return { success: false, error: data.message || "Failed to add product" };
     }
@@ -154,7 +155,11 @@ export async function deleteProduct(productId: string) {
 export async function updateProduct(
   productId: string,
   updatedProduct: {
-    [key: string]: string | number | { question: string; answer: string }[];
+    [key: string]:
+      | string
+      | number
+      | { question: string; answer: string }[]
+      | { author: string; comments: string }[];
   }
 ) {
   try {
@@ -350,6 +355,11 @@ export async function verifyPayment(
   } catch (error) {
     alert("An error occurred while verifying payment." + error);
   } finally {
-    window.location.href = "/cart-order";
+    window.history.go(-3);
+
+    setTimeout(() => {
+      window.history.replaceState(null, "", "/cart-order");
+      window.location.href = "/cart-order";
+    }, 100);
   }
 }

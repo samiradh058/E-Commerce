@@ -12,6 +12,9 @@ interface Product {
   category: string;
   quantity: number;
   qna: { question: string; answer: string }[];
+  brand: string;
+  review: { author: string; comments: string }[];
+  rating: number;
   onDelete: (productId: string) => void;
   onEdit: (product: Product) => void;
   isAdmin: boolean;
@@ -26,6 +29,9 @@ export default function EachProduct({
   category,
   quantity,
   qna,
+  brand,
+  rating,
+  review,
   onDelete,
   onEdit,
   isAdmin,
@@ -74,6 +80,9 @@ export default function EachProduct({
                 category,
                 quantity,
                 qna,
+                brand,
+                rating,
+                review,
                 onDelete,
                 onEdit,
                 isAdmin,
