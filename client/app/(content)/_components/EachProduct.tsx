@@ -7,7 +7,7 @@ interface Product {
   productId: string;
   name: string;
   price: number;
-  // image: string;
+  image: File | string;
   description: string;
   category: string;
   quantity: number;
@@ -24,7 +24,7 @@ export default function EachProduct({
   productId,
   name,
   price,
-  // image,
+  image,
   description,
   category,
   quantity,
@@ -44,7 +44,18 @@ export default function EachProduct({
         className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-transform duration-300"
       >
         <div className="relative h-56 w-full">
-          <Image src="/icon.png" alt="Item" fill className="object-cover" />
+          <Image
+            src={
+              image
+                ? typeof image === "string"
+                  ? image
+                  : URL.createObjectURL(image)
+                : "/icon.png"
+            }
+            alt="Item"
+            fill
+            className="object-cover"
+          />
         </div>
         <div className="p-4">
           <div className="flex justify-between">
@@ -75,7 +86,7 @@ export default function EachProduct({
                 productId,
                 name,
                 price,
-                // image,
+                image,
                 description,
                 category,
                 quantity,

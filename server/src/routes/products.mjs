@@ -6,7 +6,12 @@ import { Order } from "../mongoose/orderItem.mjs";
 import { User } from "../mongoose/users.mjs";
 import mongoose from "mongoose";
 
+import { uploadToCloudinary } from "../utils/uploadToCloudinary.mjs";
+import multer from "multer";
+const upload = multer({ storage: multer.memoryStorage() });
+
 const router = Router();
+
 // Fetch all products
 router.get("/products", async (req, res) => {
   try {
@@ -199,32 +204,44 @@ router.delete("/cart/delete", async (req, res) => {
 });
 
 // Add product
-router.post("/add_product", async (req, res) => {
+router.post("/add_product", upload.single("image"), async (req, res) => {
   try {
     if (!req.user || req.user.role !== "admin") {
       return res.status(401).json({ message: "Only admin can add product" });
     }
-    const { name, price, quantity, category, description, image, qna, brand } =
+    const file = req.file;
+
+    console.log("req body and req  file is ", req.body, file);
+
+    if (!file) return res.status(400).json({ message: "No image uploaded" });
+
+    const { name, price, quantity, category, description, qna, brand } =
       req.body;
 
     if (!name || !price || !quantity || !category || !description || !brand) {
       return res.status(400).json({ message: "Please fill all fields" });
     }
-    let product = new Product({
-      productId: `prod_${Date.now()}_${Math.random()
-        .toString(36)
-        .substr(2, 5)}`,
-      name,
-      price,
-      quantity,
-      category,
-      description,
-      image: image || "",
-      qna: qna || [],
-      brand,
-    });
-    const savedProduct = await product.save();
+
+    const result = await uploadToCloudinary(file.buffer);
+
+    const parsedProduct = {};
+    for (let key in req.body) {
+      try {
+        parsedProduct[key] = JSON.parse(req.body[key]);
+      } catch (err) {
+        parsedProduct[key] = req.body[key];
+      }
+    }
+    parsedProduct.image = result.secure_url;
+
+    console.log("image is ", parsedProduct.image);
+    console.log("Resut is ", result);
+
+    const newProduct = new Product(parsedProduct);
+    const savedProduct = await newProduct.save();
+
     console.log("saved product is ", savedProduct);
+
     return res
       .status(200)
       .json({ message: "Product added successfully", product: savedProduct });
@@ -253,94 +270,115 @@ router.delete("/delete_product", async (req, res) => {
 });
 
 // Update product
-router.put("/update_product/:productId", async (req, res) => {
-  try {
-    const { productId } = req.params;
-    const {
-      name,
-      price,
-      quantity,
-      category,
-      description,
-      image,
-      qna,
-      rating,
-      review,
-    } = req.body;
+router.put(
+  "/update_product/:productId",
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { productId } = req.params;
 
-    console.log("review is ", review);
+      const {
+        name,
+        price,
+        quantity,
+        category,
+        description,
+        image,
+        qna,
+        rating,
+        review,
+      } = req.body;
 
-    const existingProduct = await Product.findOne({ productId });
-    if (!existingProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+      const imageFile = req.file;
 
-    if (
-      (name || price || quantity || category || description || image || qna) &&
-      (!req.user || req.user.role !== "admin")
-    ) {
-      return res
-        .status(401)
-        .json({ message: "Only admin can update product details" });
-    }
+      console.log("req body and req  file is ", req.body, imageFile);
 
-    const updateData = {};
-
-    if (req.user?.role === "admin") {
-      if (name) updateData.name = name;
-      if (price) updateData.price = price;
-      if (quantity) updateData.quantity = quantity;
-      if (category) updateData.category = category;
-      if (description) updateData.description = description;
-      if (image) updateData.image = image;
-      if (qna) updateData.qna = qna;
-    }
-
-    if (rating !== undefined) {
-      const currentRating = existingProduct.rating;
-
-      let newRating;
-      if (!currentRating) {
-        newRating = rating;
-      } else {
-        newRating = ((currentRating + rating) / 2).toFixed(1);
+      const existingProduct = await Product.findOne({ productId });
+      if (!existingProduct) {
+        return res.status(404).json({ message: "Product not found" });
       }
 
-      updateData.rating = Number(newRating);
-    }
+      if (
+        (name ||
+          price ||
+          quantity ||
+          category ||
+          description ||
+          image ||
+          qna) &&
+        (!req.user || req.user.role !== "admin")
+      ) {
+        return res
+          .status(401)
+          .json({ message: "Only admin can update product details" });
+      }
 
-    if (review && Array.isArray(review)) {
-      const author = review[0].author;
+      const updateData = {};
 
-      const alreadyReviewed = existingProduct.review?.some(
-        (r) => r.author === author
+      if (req.user?.role === "admin") {
+        if (name) updateData.name = JSON.parse(name);
+        if (price) updateData.price = JSON.parse(price);
+        if (quantity) updateData.quantity = JSON.parse(quantity);
+        if (category) updateData.category = JSON.parse(category);
+        if (description) updateData.description = JSON.parse(description);
+        if (qna) updateData.qna = JSON.parse(qna);
+        if (rating) updateData.rating = JSON.parse(rating);
+        if (review) updateData.review = JSON.parse(review);
+      }
+
+      if (imageFile) {
+        const result = await uploadToCloudinary(imageFile.buffer);
+        updateData.image = result.secure_url;
+      }
+
+      if (rating && req.user.role === "user") {
+        const currentRating = existingProduct.rating;
+
+        let newRating;
+        if (!currentRating) {
+          newRating = rating;
+        } else {
+          newRating = ((currentRating + rating) / 2).toFixed(1);
+        }
+
+        updateData.rating = Number(newRating);
+      }
+
+      if (review && Array.isArray(review) && req.user.role === "user") {
+        const newAuthors = review.map((r) => r.author);
+        const existingAuthors =
+          existingProduct.review?.map((r) => r.author) || [];
+
+        const hasDuplicate = newAuthors.some((author) =>
+          existingAuthors.includes(author)
+        );
+
+        if (hasDuplicate) {
+          return res
+            .status(400)
+            .json({ message: "You have already reviewed this product." });
+        }
+
+        const existingReviews = existingProduct.review || [];
+        updateData.review = [...existingReviews, ...review];
+      }
+
+      const updatedProduct = await Product.findOneAndUpdate(
+        { productId },
+        { $set: updateData }, // Only update specified fields
+        { new: true } // Return the updated document
       );
 
-      if (alreadyReviewed) {
-        return res
-          .status(400)
-          .json({ message: "You have already reviewed this product." });
-      }
-
-      const existingReviews = existingProduct.review || [];
-      updateData.review = [...existingReviews, ...review];
+      return res.status(200).json({
+        message: "Product updated successfully",
+        product: updatedProduct,
+      });
+    } catch (error) {
+      console.error("Error updating product:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
     }
-
-    const updatedProduct = await Product.findOneAndUpdate(
-      { productId },
-      { $set: updateData }, // Only update specified fields
-      { new: true } // Return the updated document
-    );
-
-    return res.status(200).json({
-      message: "Product updated successfully",
-      product: updatedProduct,
-    });
-  } catch (error) {
-    console.error("Error updating product:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
   }
-});
+);
 
 // Get specific cart item detail
 router.get("/cart/:userId/:productId", async (req, res) => {

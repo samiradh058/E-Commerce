@@ -102,16 +102,32 @@ export async function updateQuantity(
 }
 
 // Add product
-export async function addProduct(formData: {
-  [key: string]: string | number | object;
+export async function addProduct(product: {
+  name: string;
+  price: number;
+  quantity: number;
+  brand: string;
+  image: File | string;
+  description: string;
+  category: string;
+  qna: { question: string; answer: string }[];
+  review: { author: string; comments: string }[];
+  rating: number;
 }) {
   try {
+    const formData = new FormData();
+    formData.append("image", product.image); // image file
+
+    // Append other fields as strings
+    Object.entries(product).forEach(([key, value]) => {
+      if (key !== "image") {
+        formData.append(key, JSON.stringify(value));
+      }
+    });
+
     const response = await fetch("http://localhost:8080/add_product", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+      body: formData,
       credentials: "include",
     });
     const data = await response.json();
@@ -155,22 +171,37 @@ export async function deleteProduct(productId: string) {
 export async function updateProduct(
   productId: string,
   updatedProduct: {
-    [key: string]:
-      | string
-      | number
-      | { question: string; answer: string }[]
-      | { author: string; comments: string }[];
+    name?: string;
+    price?: number;
+    quantity?: number;
+    brand?: string;
+    image?: File | string;
+    description?: string;
+    category?: string;
+    qna?: { question: string; answer: string }[];
+    review?: { author: string; comments: string }[];
+    rating?: number;
   }
 ) {
   try {
+    const formData = new FormData();
+
+    if (updatedProduct.image) {
+      formData.append("image", updatedProduct.image); // image file
+    }
+
+    // Append other fields as strings
+    Object.entries(updatedProduct).forEach(([key, value]) => {
+      if (key !== "image") {
+        formData.append(key, JSON.stringify(value));
+      }
+    });
+
     const response = await fetch(
       `http://localhost:8080/update_product/${productId}`,
       {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProduct),
+        body: formData,
         credentials: "include",
       }
     );

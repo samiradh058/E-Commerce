@@ -98,7 +98,7 @@ export default async function ProductPage({
                   </p>
                   <p className="text-lg">
                     Delivery Fee:{" "}
-                    <span className="font-semibold text-xl">Rs. X</span>
+                    <span className="font-semibold text-xl">Rs. 50</span>
                   </p>
                   <p className="text-lg">
                     Cash on Delivery:{" "}
