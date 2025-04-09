@@ -123,8 +123,8 @@ router.post("/add_admin", async (req, res) => {
 // Get Users
 router.get("/users", async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Only admins can view users" });
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "unauthorized" });
     }
     const users = await User.find();
     return res.status(200).json({ users });

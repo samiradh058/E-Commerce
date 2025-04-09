@@ -11,7 +11,7 @@ export default function Header() {
   const { user, loggedIn } = useAuth();
 
   return (
-    <div className="bg-background shadow-md h-fit flex w-[98%] mx-auto justify-between items-center p-3 rounded-lg">
+    <div className="bg-background shadow-md h-fit flex w-full px-4 justify-between items-center p-3 rounded-lg">
       <Link href="/" className="flex items-center gap-2">
         <div className="relative h-12 w-12">
           <Image

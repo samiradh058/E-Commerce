@@ -89,7 +89,7 @@ export default function Products() {
         setNewProduct({
           name: "",
           price: 0,
-          image: new File([], ""),
+          image: "",
           description: "",
           category: "All",
           quantity: 0,
@@ -97,6 +97,7 @@ export default function Products() {
           brand: "",
           rating: 0,
           review: [],
+          imagePreview: "",
         });
       }
     } catch (error) {
@@ -154,7 +155,7 @@ export default function Products() {
         setNewProduct({
           name: "",
           price: 0,
-          image: new File([], ""),
+          image: "",
           description: "",
           category: "All",
           quantity: 0,
@@ -162,6 +163,7 @@ export default function Products() {
           brand: "",
           rating: 0,
           review: [],
+          imagePreview: "",
         });
       }
     } catch (error) {

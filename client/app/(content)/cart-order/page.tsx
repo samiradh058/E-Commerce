@@ -46,7 +46,7 @@ export default function Cart() {
           cartResult.error === "unauthorized" ||
           orderResult.error === "unauthorized"
         ) {
-          return;
+          router.replace("/login");
         } else if (cartResult.error || orderResult.error) {
           alert("Failed to fetch cart or order items");
           router.replace("/");

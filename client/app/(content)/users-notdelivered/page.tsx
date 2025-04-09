@@ -36,6 +36,13 @@ export default function Cart() {
           fetchAllOrderItems(),
         ]);
 
+        if (
+          users?.error === "unauthorized" ||
+          orderedItems.error === "unauthorized"
+        ) {
+          router.replace("/login");
+        }
+
         if (!users || !orderedItems) {
           alert("Could not fetch users or orderedItems");
           router.replace("/");

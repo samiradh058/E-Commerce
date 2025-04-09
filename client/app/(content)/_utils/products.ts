@@ -282,22 +282,41 @@ export async function fetchAllOrderItems() {
       credentials: "include",
     });
 
-    console.log("response is ", response);
-
-    if (response.status === 401) {
-      return { error: "Error fetching ordered items" };
-    }
-
     const data = await response.json();
-
     if (!response.ok) {
-      return { message: data.message };
+      return { success: false, error: data.message || "Failed to fetch users" };
     }
-    return { data };
+    return { success: true, data: data.users };
   } catch (error) {
     console.error("Error fetching all ordered items", error);
     return { error: "fetch_failed" };
   }
+}
+
+// Get recommendations based on current Product
+interface Product {
+  productId: string;
+  name: string;
+  brand: string;
+  category: string;
+}
+export async function getRecommendedProducts(currentProduct: Product) {
+  const allProducts = await getProducts();
+  const currentNameWords = currentProduct.name.toLowerCase().split(" ");
+
+  return allProducts.filter((p: Product) => {
+    if (p.productId === currentProduct.productId) return false;
+
+    const nameMatch = currentNameWords.some((word: string) =>
+      p.name.toLowerCase().includes(word)
+    );
+
+    return (
+      p.brand === currentProduct.brand ||
+      p.category === currentProduct.category ||
+      nameMatch
+    );
+  });
 }
 
 // Change received status in order

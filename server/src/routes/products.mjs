@@ -444,7 +444,7 @@ router.get("/orders", async (req, res) => {
 
 // Get all ordered items
 router.get("/allOrders", async (req, res) => {
-  if (req.user.role !== "admin") {
+  if (!req.user || req.user.role !== "admin") {
     return res.status(401).json({ message: "unauthorized" });
   }
 

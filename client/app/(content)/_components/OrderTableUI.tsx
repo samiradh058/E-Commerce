@@ -84,6 +84,10 @@ export default function OrderTableUI({
     closeModal();
   }
 
+  if (!orderItems || orderItems.length === 0) {
+    return;
+  }
+
   return (
     <div className="min-h-screen p-6">
       <div className="w-full md:w-[90%] lg:w-[80%] mx-auto p-4 rounded-lg shadow-md">

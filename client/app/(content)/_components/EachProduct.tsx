@@ -37,12 +37,8 @@ export default function EachProduct({
   isAdmin,
 }: Product) {
   return (
-    <div className="relative group">
-      <Link
-        href={`/product/${productId}`}
-        key={productId}
-        className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-transform duration-300"
-      >
+    <div className="relative group bg-gray-100 shadow-md rounded-lg hover:shadow-xl hover:scale-105 transition-transform duration-300">
+      <Link href={`/product/${productId}`} key={productId}>
         <div className="relative h-56 w-full">
           <Image
             src={
@@ -50,11 +46,11 @@ export default function EachProduct({
                 ? typeof image === "string"
                   ? image
                   : URL.createObjectURL(image)
-                : "/icon.png"
+                : ""
             }
             alt="Item"
             fill
-            className="object-cover"
+            className="object-cover top-rounded-md"
           />
         </div>
         <div className="p-4">
@@ -64,7 +60,10 @@ export default function EachProduct({
               {category}
             </p>
           </div>
-          <p className="mb-1 text-stone-600">{description}</p>
+          <h3 className="text-sm">{brand}</h3>
+          <p className="mb-1 text-stone-600 text-justify">
+            {description.split(" ").slice(0, 10).join(" ")} ...
+          </p>
           <p className="text-stone-900 font-semibold">Rs. {price}</p>
           <p className="text-stone-600">{quantity} remaining</p>
         </div>
